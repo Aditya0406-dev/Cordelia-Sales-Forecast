@@ -10,7 +10,7 @@ try:
     import lightgbm as lgb
     import mlflow
     if "MLFLOW_TRACKING_URI" in st.secrets:
-        mlflow.set_tracking_uri(st.secrets["MLFLOW_TRACKING_URI"])
+        mlflow.set_traif cking_uri(st.secrets["MLFLOW_TRACKING_URI"])
     else:
         mlflow.set_tracking_uri("sqlite:///mlflow.db")
     MLOPS_ENGINE_ACTIVE = True
@@ -135,11 +135,9 @@ st.sidebar.markdown(f'<h2 style="color:{PRIMARY_PURPLE};">🎯 Global Controls</
 st.sidebar.markdown("### 🤖 Pipeline Model Configuration")
 
 if MLOPS_ENGINE_ACTIVE:
-    selected_model_flavor = st.sidebar.selectbox("Active Inference Model Flavor", ["XGBoost Regressor (Production)", "LightGBM Regressor (Challenger)", "Ensemble Blend Layer"])
-    st.sidebar.success(f"✅ Live Registry Connected (Port 5001)\n\nFlavor: **{selected_model_flavor}**")
+    st.success("✅ Connected to Live MLflow Production Registry")
 else:
-    st.sidebar.warning("⚠️ Running in Standalone Mode (MLflow Server Offline)")
-    selected_model_flavor = "Fallback Matrix Engine"
+    st.warning("⚠️ Running in Standalone Mode (MLflow Server Offline)")
 
 st.sidebar.markdown("---")
 available_keys = sorted(df_global[key_col].unique()) if len(df_global) > 0 else []
