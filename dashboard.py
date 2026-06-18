@@ -10,7 +10,7 @@ try:
     import lightgbm as lgb
     import mlflow
     if "MLFLOW_TRACKING_URI" in st.secrets:
-        mlflow.set_traif cking_uri(st.secrets["MLFLOW_TRACKING_URI"])
+        mlflow.set_tracking_uri(st.secrets["MLFLOW_TRACKING_URI"])
     else:
         mlflow.set_tracking_uri("sqlite:///mlflow.db")
     MLOPS_ENGINE_ACTIVE = True
