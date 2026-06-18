@@ -9,8 +9,12 @@ try:
     import xgboost as xgb
     import lightgbm as lgb
     import mlflow
-    mlflow.set_tracking_uri("http://127.0.0.1:5001")
+    if "MLFLOW_TRACKING_URI" in st.secrets:
+        mlflow.set_tracking_uri(st.secrets["MLFLOW_TRACKING_URI"])
+    else:
+        mlflow.set_tracking_uri("sqlite:///mlflow.db")
     MLOPS_ENGINE_ACTIVE = True
+
 except ImportError:
     MLOPS_ENGINE_ACTIVE = False
 
