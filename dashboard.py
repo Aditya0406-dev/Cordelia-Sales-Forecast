@@ -15,8 +15,8 @@ except ImportError:
     MLOPS_ENGINE_ACTIVE = False
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-FORECAST_PATH = os.path.join(CURRENT_DIR, "features", "forecast_results.csv")
-DB_PATH = os.path.join(CURRENT_DIR, "features", "cordelia_enterprise.db")
+FORECAST_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
+DB_PATH = os.path.join(CURRENT_DIR, "cordelia_enterprise.db")
 PRIMARY_PURPLE = "#64189E"
 ACCENT_ORANGE = "#F1723F"
 
