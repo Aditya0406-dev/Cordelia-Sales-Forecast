@@ -133,9 +133,9 @@ st.sidebar.markdown(f'<h2 style="color:{PRIMARY_PURPLE};">🎯 Global Controls</
 st.sidebar.markdown("### 🤖 Pipeline Model Configuration")
 
 if MLOPS_ENGINE_ACTIVE:
-    st.success("✅ Connected to Live MLflow Production Registry")
+    st.sidebar.success("✅ Connected to Live MLflow Production Registry")
 else:
-    st.warning("⚠️ Running in Standalone Mode (MLflow Server Offline)")
+    st.sidebar.warning("⚠️ Running in Standalone Mode (MLflow Server Offline)")
 
 st.sidebar.markdown("---")
 available_keys = sorted(df_global[key_col].unique()) if len(df_global) > 0 else []
