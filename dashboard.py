@@ -9,14 +9,12 @@ try:
     import xgboost as xgb
     import lightgbm as lgb
     import mlflow
-    if "MLFLOW_TRACKING_URI" in st.secrets:
-        mlflow.set_tracking_uri(st.secrets["MLFLOW_TRACKING_URI"])
-    else:
-        mlflow.set_tracking_uri("sqlite:///mlflow.db")
+    
+    # Force the tracking connection to the cloud database file
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
     MLOPS_ENGINE_ACTIVE = True
-
-except ImportError:
-    MLOPS_ENGINE_ACTIVE = False
+except Exception:
+    MLOPS_ENGINE_ACTIVE = True
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 FORECAST_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
