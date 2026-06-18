@@ -19,8 +19,16 @@ except Exception:
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 FORECAST_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
 DB_PATH = os.path.join(CURRENT_DIR, "cordelia_enterprise.db")
-PRIMARY_PURPLE = "#64189E"
-ACCENT_ORANGE = "#F1723F"
+PRIMARY_PURPLE = "#4A148C"
+ACCENT_ORANGE = "#FF1744"
+
+# --- CLEAN LAYOUT LOADER ---
+def load_css(file_name):
+    with open(file_name, "r") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# Run the function right away
+load_css(os.path.join(CURRENT_DIR, "style.css"))
 
 # --- PERSISTENT ENTERPRISE DATABASE INITIALIZATION ---
 def init_enterprise_db():
