@@ -1,89 +1,93 @@
-/* --- PREMIUM CORPORATE ARCHITECTURE --- */
+/* --- APP CANVAS STRUCTURAL FRAMEWORK --- */
 header { visibility: hidden !important; }
 footer { visibility: hidden !important; }
 
-/* Crisp, clean off-white executive canvas background */
+/* Adopting FinVector's clean off-white executive canvas backdrop */
 .stApp {
     background-color: #F8FAFC !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
-/* --- CRISP MINIMALIST SIDEBAR --- */
+/* --- THE CONTROL ROOM PANEL (SIDEBAR) --- */
 section[data-testid="stSidebar"] {
     background-color: #FFFFFF !important;
-    border-right: 1px solid #E2E8F0 !important;
+    border-right: 2px solid #E2E8F0 !important; /* Thick, reliable boundary lines */
 }
 
-/* --- REVENUE & BOOKING DATA CARDS --- */
+/* --- THE DATA CARDS: CLEAR STRATIFIED METRICS --- */
 div[data-testid="stMetricContainer"] {
     background-color: #FFFFFF !important;
-    border: 1px solid #E2E8F0 !important;
-    border-radius: 12px !important;
-    padding: 20px 24px !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
-    transition: all 0.2s ease-in-out !important;
+    border: 1px solid #CBD5E1 !important; /* Grounded solid steel borders */
+    border-top: 4px solid #4A148C !important; /* Cordelia Brand primary line */
+    border-radius: 8px !important; /* Structured square corners */
+    padding: 24px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important; /* Flat drop shadow */
 }
 
-/* Clean, elegant hover focus for the client */
+/* Non-disruptive, solid interaction for active review */
 div[data-testid="stMetricContainer"]:hover {
-    transform: translateY(-2px) !important;
-    border-color: #4A148C !important; /* Cordelia Royal Purple Highlight */
-    box-shadow: 0 10px 15px -3px rgba(74, 20, 140, 0.05), 0 4px 6px -2px rgba(74, 20, 140, 0.03) !important;
+    border-color: #4A148C !important;
+    box-shadow: 0 4px 12px rgba(74, 20, 140, 0.08) !important;
 }
 
-/* Card Labels */
+/* FinVector Clean Lettering Style for Labels */
 div[data-testid="stMetricLabel"] p {
-    font-size: 13px !important;
+    font-size: 12px !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    color: #64748B !important;
-    font-weight: 600 !important;
+    letter-spacing: 0.06em !important;
+    color: #475569 !important; /* Heavy slate labels */
+    font-weight: 700 !important;
 }
 
-/* Crisp Clean Numbers */
+/* Clear, Strong, Highly Scannable Metric Values */
 div[data-testid="stMetricValue"] div {
-    font-size: 30px !important;
-    font-weight: 700 !important;
-    color: #0F172A !important;
+    font-size: 36px !important;
+    font-weight: 800 !important;
+    color: #0F172A !important; /* Solid midnight black value indicators */
     letter-spacing: -0.02em !important;
 }
 
-/* --- MODERN ENTERPRISE DATA TABLES --- */
+/* --- ENTERPRISE LEVEL REPORTING MATRIX (TABLES) --- */
 div[data-testid="stTable"] table {
     background-color: #FFFFFF !important;
-    border: 1px solid #E2E8F0 !important;
-    border-radius: 8px !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 6px !important;
 }
-
 div[data-testid="stTable"] th {
-    background-color: #F1F5F9 !important;
-    color: #475569 !important;
+    background-color: #F1F5F9 !important; /* Flat grey structural block headers */
+    color: #1E293B !important;
     font-size: 12px !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.03em !important;
-    font-weight: 600 !important;
-    padding: 12px !important;
+    letter-spacing: 0.04em !important;
+    font-weight: 700 !important;
+    padding: 14px 16px !important;
+    border-bottom: 2px solid #CBD5E1 !important;
 }
-
 div[data-testid="stTable"] td {
     color: #334155 !important;
-    padding: 14px !important;
-    border-bottom: 1px solid #F1F5F9 !important;
+    padding: 14px 16px !important;
+    font-size: 14px !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+}
+/* Alternate row shading for massive numeric matrices */
+div[data-testid="stTable"] tr:nth-child(even) {
+    background-color: #F8FAFC !important;
 }
 
-/* --- REVENUE COMPONENT ACTIONS BUTTON --- */
+/* --- THE EXECUTING ACTION CALL BUTTON --- */
 button[data-testid="stBaseButton-secondary"] {
-    background-color: #4A148C !important; /* Premium Cordelia Brand Purple */
+    background-color: #4A148C !important; /* Solid corporate color brand accent */
     color: #FFFFFF !important;
-    border-radius: 8px !important;
+    border-radius: 6px !important;
     border: none !important;
-    font-weight: 600 !important;
-    padding: 10px 24px !important;
-    box-shadow: 0 4px 12px rgba(74, 20, 140, 0.15) !important;
-    transition: background-color 0.2s ease !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    font-size: 13px !important;
+    padding: 12px 32px !important;
+    box-shadow: 0 2px 4px rgba(74, 20, 140, 0.1) !important;
+    transition: background-color 0.15s ease !important;
 }
-
 button[data-testid="stBaseButton-secondary"]:hover {
-    background-color: #6A1B9A !important;
-    color: #FFFFFF !important;
+    background-color: #380B6B !important; /* Deeper solid color shift */
 }
