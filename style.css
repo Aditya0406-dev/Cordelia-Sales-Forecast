@@ -1,81 +1,89 @@
-/* --- EXECUTIVE DARK MODE RESET --- */
+/* --- PREMIUM CORPORATE ARCHITECTURE --- */
 header { visibility: hidden !important; }
 footer { visibility: hidden !important; }
 
-/* Set deep luxury maritime dark background */
+/* Crisp, clean off-white executive canvas background */
 .stApp {
-    background: radial-gradient(circle at top right, #111827, #030712) !important;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+    background-color: #F8FAFC !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
-/* --- PREMIUM SIDEBAR STYLING --- */
+/* --- CRISP MINIMALIST SIDEBAR --- */
 section[data-testid="stSidebar"] {
-    background-color: #0B0F19 !important;
-    border-right: 1px solid #1F2937 !important;
+    background-color: #FFFFFF !important;
+    border-right: 1px solid #E2E8F0 !important;
 }
 
-/* Make all text inside sidebar clean white */
-section[data-testid="stSidebar"] p, 
-section[data-testid="stSidebar"] label,
-section[data-testid="stSidebar"] h1, 
-section[data-testid="stSidebar"] h2, 
-section[data-testid="stSidebar"] h3 {
-    color: #F8FAFC !important;
-    font-weight: 500 !important;
-}
-
-/* --- THE "WOW" GLASSMORPHISM DATA CARDS --- */
+/* --- REVENUE & BOOKING DATA CARDS --- */
 div[data-testid="stMetricContainer"] {
-    background: rgba(255, 255, 255, 0.03) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 20px !important;
-    padding: 24px !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 12px !important;
+    padding: 20px 24px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.2s ease-in-out !important;
 }
 
-/* Neon-glow hover animation that excites the client */
+/* Clean, elegant hover focus for the client */
 div[data-testid="stMetricContainer"]:hover {
-    transform: translateY(-5px) !important;
-    background: rgba(255, 255, 255, 0.06) !important;
-    border-color: #A855F7 !important; /* Royal Cyber Purple Accent */
-    box-shadow: 0 0 25px rgba(168, 85, 247, 0.25) !important;
+    transform: translateY(-2px) !important;
+    border-color: #4A148C !important; /* Cordelia Royal Purple Highlight */
+    box-shadow: 0 10px 15px -3px rgba(74, 20, 140, 0.05), 0 4px 6px -2px rgba(74, 20, 140, 0.03) !important;
 }
 
-/* Small label above figures */
+/* Card Labels */
 div[data-testid="stMetricLabel"] p {
-    font-size: 12px !important;
+    font-size: 13px !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.1em !important;
-    color: #9CA3AF !important;
+    letter-spacing: 0.05em !important;
+    color: #64748B !important;
     font-weight: 600 !important;
 }
 
-/* Sleek Glowing Numbers */
+/* Crisp Clean Numbers */
 div[data-testid="stMetricValue"] div {
-    font-size: 32px !important;
-    font-weight: 800 !important;
-    color: #FFFFFF !important;
-    letter-spacing: -0.03em !important;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.1) !important;
+    font-size: 30px !important;
+    font-weight: 700 !important;
+    color: #0F172A !important;
+    letter-spacing: -0.02em !important;
 }
 
-/* --- DYNAMIC INTERACTIVE BUTTONS --- */
+/* --- MODERN ENTERPRISE DATA TABLES --- */
+div[data-testid="stTable"] table {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+}
+
+div[data-testid="stTable"] th {
+    background-color: #F1F5F9 !important;
+    color: #475569 !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    font-weight: 600 !important;
+    padding: 12px !important;
+}
+
+div[data-testid="stTable"] td {
+    color: #334155 !important;
+    padding: 14px !important;
+    border-bottom: 1px solid #F1F5F9 !important;
+}
+
+/* --- REVENUE COMPONENT ACTIONS BUTTON --- */
 button[data-testid="stBaseButton-secondary"] {
-    background: linear-gradient(135deg, #7C3AED 0%, #4C1D95 100%) !important;
+    background-color: #4A148C !important; /* Premium Cordelia Brand Purple */
     color: #FFFFFF !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.05em;
-    padding: 12px 28px !important;
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3) !important;
-    transition: all 0.2s ease !important;
+    border-radius: 8px !important;
+    border: none !important;
+    font-weight: 600 !important;
+    padding: 10px 24px !important;
+    box-shadow: 0 4px 12px rgba(74, 20, 140, 0.15) !important;
+    transition: background-color 0.2s ease !important;
 }
 
 button[data-testid="stBaseButton-secondary"]:hover {
-    transform: scale(1.03) !important;
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5) !important;
+    background-color: #6A1B9A !important;
+    color: #FFFFFF !important;
 }
