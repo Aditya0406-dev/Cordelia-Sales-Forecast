@@ -307,7 +307,7 @@ if True in monsoon_df.columns and False in monsoon_df.columns:
     with col_tbl:
         st.dataframe(monsoon_df.style.format({'Dry Season Voyage Avg': '{:.1f}', 'Monsoon Voyage Avg': '{:.1f}', 'Net Volume Lost': '{:.1f}', 'Performance Deficit (%)': '{:.2f}%'}), use_container_width=True, hide_index=True)
     with col_alr:
-        st.markdown("##### ⚠️ Revenue Protection Adjustments")
+        st.markdown("##### Revenue Protection Adjustments")
         for _, row in monsoon_df.iterrows():
             with st.container(border=True):
                 if row['Performance Deficit (%)'] > 15.0:
