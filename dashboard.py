@@ -59,12 +59,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Run the function right away
-load_css(os.path.join(CURRENT_DIR, "style.css"))
-
 # Force Streamlit to load inside our custom premium canvas container
 st.markdown('<div class="finvector-canvas">', unsafe_allow_html=True)
 
+# Run the function right away
+load_css(os.path.join(CURRENT_DIR, "style.css"))
 
 # --- PERSISTENT ENTERPRISE DATABASE INITIALIZATION ---
 def init_enterprise_db():
