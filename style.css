@@ -1,41 +1,83 @@
-/* Main background adjustment */
-.stApp { 
-    background-color: #FAFAFA !important; 
-    font-family: 'Inter', sans-serif !important; 
+/* 1. GLOBAL CANVAS VIEW (Wipes out Streamlit's developer look) */
+.stApp {
+    background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%) !important;
+    font-family: 'Inter', -apple-system, sans-serif !important;
 }
 
-/* FinVector Corporate Purple Headers */
-h1 { 
-    color: #3B0764 !important; 
-    font-weight: 800 !important; 
-}
-h2, h3, h4 { 
-    color: #1E1B4B !important; 
-    font-weight: 700 !important; 
+/* Custom layout framing wrapper */
+.finvector-canvas {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
 }
 
-/* Premium Executive KPI Metric Blocks */
-div[data-testid="metric-container"] {
+/* Hide raw Streamlit engineering clutter */
+#MainMenu, footer, header[data-testid="stHeader"] {
+    visibility: hidden !important;
+    display: none !important;
+}
+
+/* 2. PREMIUM EXECUTIVE SIDEBAR CONSOLE */
+section[data-testid="stSidebar"] {
+    background-color: #FFFFFF !important;
+    border-right: 1px solid #E2E8F0 !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02) !important;
+}
+section[data-testid="stSidebar"] .stMarkdown h3 {
+    color: #3B0764 !important; /* FinVector Purple */
+    font-weight: 800 !important;
+    border-left: 4px solid #EA580C; /* Accent Orange Orange */
+    padding-left: 10px;
+}
+
+/* 3. FLOATING DATA PANELS (Wraps your metrics & tables automatically) */
+div[data-testid="metric-container"], div[data-testid="stDataFrame"] {
     background-color: #FFFFFF !important;
     border: 1px solid #E4E4E7 !important;
-    border-radius: 12px !important;
-    padding: 1.2rem !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.02), 0 4px 6px -4px rgba(0, 0, 0, 0.02) !important;
+    transition: transform 0.2s ease !important;
 }
-div[data-testid="stMetricSimpleValue"] { 
-    font-size: 2rem !important; 
-    font-weight: 800 !important; 
-    color: #3B0764 !important; 
+div[data-testid="metric-container"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04) !important;
 }
 
-/* FinVector Bright Accent Buttons */
-div.stButton > button:first-child {
-    background-color: #EA580C !important;
-    color: white !important;
-    border-radius: 8px !important;
-    border: none !important;
-    font-weight: 600 !important;
+/* Typography polish for numerical insights */
+div[data-testid="stMetricSimpleValue"] {
+    font-size: 2.2rem !important;
+    font-weight: 800 !important;
+    color: #3B0764 !important;
+    letter-spacing: -0.03em !important;
 }
-div.stButton > button:first-child:hover { 
-    background-color: #C2410C !important; 
+div[data-testid="stMetricLabel"] p {
+    font-size: 0.85rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: #64748B !important;
+    font-weight: 700 !important;
+}
+
+/* 4. HIGH-CONTRAST ACTION BUTTONS */
+div.stButton > button:first-child {
+    background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%) !important;
+    color: #FFFFFF !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    padding: 0.65rem 2.2rem !important;
+    border-radius: 10px !important;
+    border: none !important;
+    box-shadow: 0 8px 16px rgba(234, 88, 12, 0.2) !important;
+    transition: all 0.2s ease-in-out !important;
+}
+div.stButton > button:first-child:hover {
+    background: linear-gradient(135deg, #C2410C 0%, #9A3412 100%) !important;
+    box-shadow: 0 12px 20px rgba(234, 88, 12, 0.35) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Clean spacing structure across core grids */
+.element-container {
+    margin-bottom: 1.25rem !important;
 }
