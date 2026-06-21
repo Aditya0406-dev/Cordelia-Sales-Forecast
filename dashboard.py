@@ -30,35 +30,6 @@ def load_css(file_name):
 # CALL THE FUNCTION FIRST
 load_css("style.css")
 
-# NOW PASTE YOUR NEW CODE HERE (Make sure it touches the left wall!)
-# ==========================================
-# EXTRA CUSTOM CSS (Overhauling Streamlit Grid Structure)
-# ==========================================
-st.markdown("""
-    <style>
-        /* 1. Force a clean, modern off-white background across the entire core window */
-        .stApp {
-            background-color: #FAFAFA !important;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
-        }
-
-        /* 2. Strip Streamlit's default header gradient/bar completely */
-        header[data-testid="stHeader"] {
-            background: transparent !important;
-            border-bottom: 1px solid #E2E8F0 !important;
-        }
-
-        /* 3. Re-engineer the Sidebar to match a premium corporate console */
-        section[data-testid="stSidebar"] {
-            background-color: #FFFFFF !important;
-            border-right: 1px solid #E2E8F0 !important;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02) !important;
-        }
-        
-        /* ... (rest of the CSS code block from earlier) ... */
-    </style>
-""", unsafe_allow_html=True)
-
 # Force Streamlit to load inside our custom premium canvas container
 st.markdown('<div class="finvector-canvas">', unsafe_allow_html=True)
 
