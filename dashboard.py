@@ -25,7 +25,13 @@ ACCENT_ORANGE = "#FF1744"
 # --- CLEAN LAYOUT LOADER ---
 def load_css(file_name):
     with open(file_name, "r") as f:
-        # ==========================================
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# CALL THE FUNCTION FIRST
+load_css("style.css")
+
+# NOW PASTE YOUR NEW CODE HERE (Make sure it touches the left wall!)
+# ==========================================
 # EXTRA CUSTOM CSS (Overhauling Streamlit Grid Structure)
 # ==========================================
 st.markdown("""
@@ -63,6 +69,7 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
+
 
 # Run the function right away
 load_css(os.path.join(CURRENT_DIR, "style.css"))
