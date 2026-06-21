@@ -27,8 +27,6 @@ def load_css(file_name):
     with open(file_name, "r") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Force Streamlit to load inside our custom premium canvas container
-st.markdown('<div class="finvector-canvas">', unsafe_allow_html=True)
 
 # Run the function right away
 load_css(os.path.join(CURRENT_DIR, "style.css"))
