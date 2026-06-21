@@ -62,6 +62,10 @@ st.markdown("""
 # Run the function right away
 load_css(os.path.join(CURRENT_DIR, "style.css"))
 
+# Force Streamlit to load inside our custom premium canvas container
+st.markdown('<div class="finvector-canvas">', unsafe_allow_html=True)
+
+
 # --- PERSISTENT ENTERPRISE DATABASE INITIALIZATION ---
 def init_enterprise_db():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
