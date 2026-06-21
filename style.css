@@ -1,88 +1,114 @@
-/* ==============================================================================
-   🏢 FINVECTOR CORPORATE MINIMALISM OVERRIDE (PREMIUM WORKSPACE)
-   ============================================================================== */
+/* --- SECTION 1: FORCING FINVECTOR SYSTEM-WIDE CANVAS WIDTH --- */
+header { visibility: hidden !important; }
+footer { visibility: hidden !important; }
 
-/* 1. THE MAIN CANVAS (FinVector Crisp White/Light Grey Grid) */
+/* Force full enterprise dashboard width and apply FinVector's clean off-white background */
+.block-container {
+    max-width: 95% !important;
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+    padding-left: 3rem !important;
+    padding-right: 3rem !important;
+}
+
 .stApp {
-    background-color: #FAFAFA !important;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    background-color: #F8FAFC !important; /* FinVector base slate white */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
-/* Force wide layout dimensions to stay clean and centered */
-[data-testid="stMainBlockContainer"] {
-    max-width: 1400px !important;
-    padding: 3rem 2.5rem !important;
-}
-
-/* Remove default engineering headers and bottom footers */
-header[data-testid="stHeader"], #MainMenu, footer {
-    visibility: hidden !important;
-    display: none !important;
-}
-
-/* 2. THE MINIMALIST SIDEBAR */
+/* --- SECTION 2: CORPORATE SIDEBAR INTEGRATION --- */
 section[data-testid="stSidebar"] {
     background-color: #FFFFFF !important;
     border-right: 1px solid #E2E8F0 !important;
-    box-shadow: none !important;
+    padding-top: 1rem !important;
 }
 
-/* FinVector Sidebar Header Format */
-section[data-testid="stSidebar"] .stMarkdown h3 {
-    color: #0F172A !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.02em !important;
-    border-left: 4px solid #000000 !important; /* Elegant black anchor line */
-    padding-left: 10px !important;
-    margin-bottom: 25px !important;
+/* Make all text inputs and select boxes inside sidebar clean and sharp */
+section[data-testid="stSidebar"] div[data-baseweb="select"], 
+section[data-testid="stSidebar"] input {
+    border-radius: 6px !important;
+    border: 1px solid #CBD5E1 !important;
+    background-color: #F8FAFC !important;
 }
 
-/* 3. FLOATING DATA PANELS (FinVector Premium Metric Cards) */
-/* This transforms rigid metric rows and data frames into framed white containers */
-div[data-testid="metric-container"], div[data-testid="stDataFrame"], .stExpander {
+/* --- SECTION 3: RESTRUCTURING FLOATING METRICS INTO SOLID PODS --- */
+div[data-testid="stMetricContainer"] {
     background-color: #FFFFFF !important;
     border: 1px solid #E2E8F0 !important;
-    border-radius: 12px !important;
-    padding: 1.5rem !important;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
-    margin-bottom: 1.5rem !important;
+    border-top: 4px solid #4A148C !important; /* Cordelia anchor brand identifier */
+    border-radius: 8px !important;
+    padding: 24px 28px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    margin-bottom: 15px !important;
 }
 
-/* Clean, crisp metric labels and text metrics */
-div[data-testid="stMetricSimpleValue"] {
-    font-size: 2.1rem !important;
+/* Typography alignment inside the metric block */
+div[data-testid="stMetricLabel"] p {
+    font-size: 13px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: #64748B !important; /* Premium muted corporate grey */
     font-weight: 700 !important;
-    color: #0F172A !important;
+}
+
+div[data-testid="stMetricValue"] div {
+    font-size: 34px !important;
+    font-weight: 800 !important;
+    color: #0F172A !important; /* Bold institutional values */
     letter-spacing: -0.03em !important;
 }
 
-div[data-testid="stMetricLabel"] p {
-    font-size: 0.8rem !important;
+/* --- SECTION 4: THE FLEET YIELD MATRIX (DATA TABLE) --- */
+div[data-testid="stTable"] table {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Match FinVector's clean structural header block look */
+div[data-testid="stTable"] th {
+    background-color: #F1F5F9 !important;
+    color: #334155 !important;
+    font-size: 12px !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.08em !important; /* Spread out uppercase like FinVector */
-    color: #64748B !important;
-    font-weight: 600 !important;
+    letter-spacing: 0.05em !important;
+    font-weight: 700 !important;
+    padding: 14px 18px !important;
+    border-bottom: 2px solid #CBD5E1 !important;
 }
 
-/* 4. SOLID BRAND ACTION BUTTONS */
-div.stButton > button:first-child {
-    background-color: #0F172A !important; /* Deep Slate/Black executive button */
+div[data-testid="stTable"] td {
+    color: #334155 !important;
+    padding: 14px 18px !important;
+    font-size: 14px !important;
+    border-bottom: 1px solid #F1F5F9 !important;
+}
+
+/* Highlight row line on hover for corporate presentations */
+div[data-testid="stTable"] tr:hover {
+    background-color: #F8FAFC !important;
+}
+
+/* --- SECTION 5: ACTIONABLE CALL-TO-BUTTON REWORK --- */
+button[data-testid="stBaseButton-secondary"] {
+    background-color: #4A148C !important; /* Pure solid brand accent */
     color: #FFFFFF !important;
-    font-size: 0.9rem !important;
-    font-weight: 600 !important;
-    padding: 0.6rem 2.2rem !important;
     border-radius: 6px !important;
-    border: 1px solid #0F172A !important;
-    transition: all 0.2s ease !important;
-    box-shadow: none !important;
+    border: none !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    font-size: 12px !important;
+    padding: 14px 36px !important;
+    box-shadow: 0 4px 12px rgba(74, 20, 140, 0.15) !important;
+    width: auto !important;
 }
 
-div.stButton > button:first-child:hover {
-    background-color: #1E293B !important;
-    border-color: #1E293B !important;
-}
-
-/* Fix spacing gaps across elements */
-.element-container {
-    margin-bottom: 1.25rem !important;
+button[data-testid="stBaseButton-secondary"]:hover {
+    background-color: #380B6B !important;
+    box-shadow: 0 6px 16px rgba(74, 20, 140, 0.25) !important;
 }
