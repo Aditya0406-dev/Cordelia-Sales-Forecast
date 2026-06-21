@@ -19,6 +19,10 @@ except Exception:
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 FORECAST_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
 DB_PATH = os.path.join(CURRENT_DIR, "cordelia_enterprise.db")
+
+# 1. NEW FIXED LOCATION: Move this here to force the sidebar to display
+st.set_page_config(page_title="Cordelia Cruise Enterprise Sales Forecast", layout="wide")
+
 PRIMARY_PURPLE = "#4A148C"
 ACCENT_ORANGE = "#FF1744"
 
@@ -47,7 +51,6 @@ def init_enterprise_db():
 
 init_enterprise_db()
 
-st.set_page_config(page_title="Cordelia Cruise Enterprise Sales Forecast", layout="wide")
 
 # =========================================================
 # 🔒 ARCHITECTURAL UPGRADE 1: ROLE-BASED ACCESS GATEWAY
