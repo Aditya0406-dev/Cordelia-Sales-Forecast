@@ -1,115 +1,121 @@
 /* ==============================================================================
-   🏢 FINVECTOR CORPORATE STYLE SHEET (FIXED SIDEBAR TOGGLE UTILITY)
+   🏢 FINVECTOR ENTERPRISE MINIMALISM ENGINE (TOTAL UI TRANSFORMATION)
    ============================================================================== */
 
 /* 1. SEAMLESS WORKSPACE CANVAS */
 .stApp {
-    background-color: #FAFAFA !important; /* FinVector's clean off-white canvas */
+    background-color: #FAFAFA !important; /* Crisp corporate off-white background */
     font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
 }
 
-/* Let the wide dashboard layout breathe naturally without crushing grid elements */
+/* Give the entire dashboard page spacious margins like a high-end banking portal */
 [data-testid="stMainBlockContainer"] {
-    max-width: 1400px !important;
-    padding: 2.5rem 2rem !important;
+    max-width: 1440px !important;
+    padding: 3.5rem 3rem !important;
 }
 
-/* FIXED: Hide the top header bar background, but KEEP the toggle buttons active */
+/* Keep the top header invisible but keep your layout toggle buttons completely safe */
 header[data-testid="stHeader"] {
     background-color: transparent !important;
-    background: transparent !important;
     box-shadow: none !important;
 }
-
-/* Force the sidebar collapse/expand toggle buttons to remain completely visible */
-header[data-testid="stHeader"] button, 
-[data-testid="stSidebarCollapseButton"] {
+header[data-testid="stHeader"] button, [data-testid="stSidebarCollapseButton"] {
     visibility: visible !important;
     display: inline-flex !important;
-    color: #0F172A !important; /* Dark corporate gray button icon */
+    color: #0F172A !important;
     background-color: #FFFFFF !important;
     border: 1px solid #E2E8F0 !important;
     border-radius: 6px !important;
-    z-index: 999999 !important;
 }
-
-/* Hide raw developer options menus and footer credits */
 #MainMenu, footer {
     visibility: hidden !important;
     display: none !important;
 }
 
-/* 2. THE VISIBLE MINIMALIST SIDEBAR */
+/* 2. THE PREMIUM EXECUTIVE SIDEBAR CONSOLE */
 section[data-testid="stSidebar"] {
     background-color: #FFFFFF !important;
     border-right: 1px solid #E2E8F0 !important;
     box-shadow: none !important;
 }
 
-/* Style the Global Controls Header on your sidebar panel */
-section[data-testid="stSidebar"] .stMarkdown h2 {
-    color: #4A148C !important; /* Maps your PRIMARY_PURPLE script variable */
+/* Style the Global Controls and parameter tags on your left panel */
+section[data-testid="stSidebar"] .stMarkdown h2, 
+section[data-testid="stSidebar"] .stMarkdown h3 {
+    color: #4A148C !important; /* Your signature corporate purple theme */
     font-weight: 700 !important;
     letter-spacing: -0.02em !important;
     border-left: 4px solid #4A148C !important;
     padding-left: 10px !important;
-    margin-top: 1.5rem !important;
+    margin-top: 1.75rem !important;
     margin-bottom: 1rem !important;
 }
-
-/* Clean styling for sidebar dropdown headers */
-section[data-testid="stSidebar"] h3 {
-    color: #0F172A !important;
+section[data-testid="stSidebar"] label p {
+    font-size: 0.85rem !important;
+    color: #475569 !important;
     font-weight: 600 !important;
-    font-size: 1.1rem !important;
-    margin-top: 1.25rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
 }
 
-/* 3. ALIGNED MATRIX CARDS & COMPONENT POLISH */
+/* 3. TOTAL OVERHAUL OF ALERTS (Transforming Raw Colored Strips to Luxury Cards) */
+/* This targets Streamlit's alert boxes and turns them into clean white floating cards */
+div[data-testid="stNotification"] {
+    background-color: #FFFFFF !important; /* Forces background from raw green/red to crisp white */
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -2px rgba(0, 0, 0, 0.02) !important;
+    margin-bottom: 1.25rem !important;
+}
 
-/* Style data tables cleanly without forcing rigid outer margins */
+/* Add a clean left-side decorative indicator block to individual alert states */
+div[data-testid="stNotification"]:has(div[role="alert"]) {
+    border-left: 5px solid #10B981 !important; /* Clean emerald green left line for stable items */
+}
+div[data-testid="stNotification"]:has(.stException), 
+div[data-testid="stNotification"]:contains("High Disruption") {
+    border-left: 5px solid #EF4444 !important; /* Clean crimson red left line for high disruption items */
+}
+
+/* Clean text formatting for inside your revenue adjustment message text blocks */
+div[data-testid="stNotification"] p {
+    color: #334155 !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    line-height: 1.6 !important;
+}
+
+/* 4. PREMIUM DATA GRID & DATA CARD RESTRUCTURING */
 div[data-testid="stDataFrame"] {
     background: #FFFFFF !important;
     border: 1px solid #E2E8F0 !important;
     border-radius: 12px !important;
-    padding: 0.75rem !important;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+    padding: 1rem !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01) !important;
 }
 
-/* Format your numeric KPIs with clean slate corporate tones */
-div[data-testid="metric-container"] {
-    background-color: #FFFFFF !important;
-    border: 1px solid #E2E8F0 !important;
-    border-radius: 12px !important;
-    padding: 1.25rem !important;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
-}
-div[data-testid="stMetricSimpleValue"] {
+/* Style main title headers inside the app content canvas */
+h1, h2, h3 {
     color: #0F172A !important;
     font-weight: 700 !important;
+    letter-spacing: -0.03em !important;
 }
 
-/* Style form labels and text select inputs */
-label p {
-    font-size: 0.85rem !important;
-    color: #475569 !important;
-    font-weight: 600 !important;
-}
-
-/* 4. SOLID BRAND ACTION BUTTONS */
+/* 5. BRAND CALL-TO-ACTION BUTTONS */
 div.stButton > button:first-child {
-    background-color: #4A148C !important; /* Crisp purple brand key */
+    background-color: #4A148C !important; /* Deep signature purple key */
     color: #FFFFFF !important;
-    font-size: 0.9rem !important;
+    font-size: 0.95rem !important;
     font-weight: 600 !important;
-    padding: 0.65rem 2.2rem !important;
-    border-radius: 6px !important;
+    padding: 0.7rem 2.5rem !important;
+    border-radius: 8px !important;
     border: 1px solid #4A148C !important;
     transition: all 0.2s ease !important;
-    box-shadow: none !important;
+    box-shadow: 0 4px 12px rgba(74, 20, 140, 0.15) !important;
 }
-
 div.stButton > button:first-child:hover {
     background-color: #300C5A !important;
     border-color: #300C5A !important;
+    transform: translateY(-1px) !important;
 }
