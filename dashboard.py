@@ -25,7 +25,44 @@ ACCENT_ORANGE = "#FF1744"
 # --- CLEAN LAYOUT LOADER ---
 def load_css(file_name):
     with open(file_name, "r") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+        # ==========================================
+# EXTRA CUSTOM CSS (Overhauling Streamlit Grid Structure)
+# ==========================================
+st.markdown("""
+    <style>
+        /* Force clean layout spacing like FinVector */
+        .block-container { max-width: 1400px; padding-top: 1.5rem; }
+        
+        /* Premium Card Containers for Layout Sections */
+        .corporate-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E4E4E7;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        }
+        
+        /* Clean Header Accent Line */
+        .brand-header {
+            border-left: 5px solid #EA580C;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        
+        /* Style Tabs to look like FinVector navigation bar */
+        div[data-testid="stTabs"] button {
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+            color: #64748B !important;
+            padding: 10px 20px !important;
+        }
+        div[data-testid="stTabs"] button[aria-selected="true"] {
+            color: #3B0764 !important;
+            border-bottom: 3px solid #3B0764 !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # Run the function right away
 load_css(os.path.join(CURRENT_DIR, "style.css"))
