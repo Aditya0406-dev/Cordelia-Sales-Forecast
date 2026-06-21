@@ -36,40 +36,28 @@ load_css("style.css")
 # ==========================================
 st.markdown("""
     <style>
-        /* Force clean layout spacing like FinVector */
-        .block-container { max-width: 1400px; padding-top: 1.5rem; }
-        
-        /* Premium Card Containers for Layout Sections */
-        .corporate-card {
-            background-color: #FFFFFF;
-            border: 1px solid #E4E4E7;
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        /* 1. Force a clean, modern off-white background across the entire core window */
+        .stApp {
+            background-color: #FAFAFA !important;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+        }
+
+        /* 2. Strip Streamlit's default header gradient/bar completely */
+        header[data-testid="stHeader"] {
+            background: transparent !important;
+            border-bottom: 1px solid #E2E8F0 !important;
+        }
+
+        /* 3. Re-engineer the Sidebar to match a premium corporate console */
+        section[data-testid="stSidebar"] {
+            background-color: #FFFFFF !important;
+            border-right: 1px solid #E2E8F0 !important;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.02) !important;
         }
         
-        /* Clean Header Accent Line */
-        .brand-header {
-            border-left: 5px solid #EA580C;
-            padding-left: 15px;
-            margin-bottom: 25px;
-        }
-        
-        /* Style Tabs to look like FinVector navigation bar */
-        div[data-testid="stTabs"] button {
-            font-size: 1.1rem !important;
-            font-weight: 600 !important;
-            color: #64748B !important;
-            padding: 10px 20px !important;
-        }
-        div[data-testid="stTabs"] button[aria-selected="true"] {
-            color: #3B0764 !important;
-            border-bottom: 3px solid #3B0764 !important;
-        }
+        /* ... (rest of the CSS code block from earlier) ... */
     </style>
 """, unsafe_allow_html=True)
-
 
 # Run the function right away
 load_css(os.path.join(CURRENT_DIR, "style.css"))
