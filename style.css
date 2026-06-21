@@ -1,77 +1,97 @@
 /* ==============================================================================
-   🏢 FINVECTOR MINIMALIST DESIGN SYSTEM (PERFECT ALIGNMENT BYPASS)
+   🏢 FINVECTOR FINTECH UI OVERRIDE (SAFE CONTAINER-SPECIFIC INTEGRATION)
    ============================================================================== */
 
-/* 1. GLOBAL LAYOUT FRAMEWORK */
+/* 1. MASTER VIEWPORT FRAMEWORK */
 .stApp {
-    background-color: #F8FAFC !important; /* Premium FinVector Light Slate Grey */
+    background-color: #FAFAFA !important; /* FinVector's clean off-white canvas */
     font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
 }
 
-/* Give the main grid ample breathing room like a real corporate dashboard */
+/* Let the wide dashboard layout breathe naturally without crushing login columns */
 [data-testid="stMainBlockContainer"] {
     max-width: 1400px !important;
     padding: 3rem 2.5rem !important;
 }
 
-/* Hide native Streamlit developer headers and footer credits completely */
+/* Remove default engineering header bands and bottom footers */
 header[data-testid="stHeader"], #MainMenu, footer {
     visibility: hidden !important;
     display: none !important;
 }
 
-/* 2. CORPORATE SIDEBAR INTERFACE */
+/* 2. THE MINIMALIST CONSOLE SIDEBAR */
 section[data-testid="stSidebar"] {
     background-color: #FFFFFF !important;
     border-right: 1px solid #E2E8F0 !important;
     box-shadow: none !important;
 }
 
-/* Clean text formatting for sidebar section blocks */
-section[data-testid="stSidebar"] .stMarkdown h3 {
-    color: #0F172A !important;
+/* Style the Global Controls Header on your sidebar */
+section[data-testid="stSidebar"] .stMarkdown h2 {
+    color: #4A148C !important; /* Your PRIMARY_PURPLE variable theme */
     font-weight: 700 !important;
     letter-spacing: -0.02em !important;
-    border-left: 4px solid #0F172A !important; /* Bold Black Anchor Line */
+    border-left: 4px solid #4A148C !important;
     padding-left: 10px !important;
-    margin-top: 2rem !important;
+    margin-top: 1.5rem !important;
     margin-bottom: 1rem !important;
 }
 
-/* 3. ALIGNED DATA MESH (Fixes the Mismatched/Smashed Columns) */
+/* Style technical configurations subheaders */
+section[data-testid="stSidebar"] .stMarkdown h3 {
+    color: #0F172A !important;
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+    margin-top: 1.25rem !important;
+}
 
-/* Style your Data Table without forcing hard margins that break column widths */
+/* Style the internal sidebar selectboxes and interactive labels */
+section[data-testid="stSidebar"] label p, [data-testid="stMainBlockContainer"] label p {
+    font-size: 0.85rem !important;
+    color: #475569 !important;
+    font-weight: 600 !important;
+}
+
+/* 3. TARGETED BLOCK DESIGN (Fixes Mismatching & Overlapping) */
+
+/* Style data tables cleanly without forcing rigid outer margins */
 div[data-testid="stDataFrame"] {
-    background-color: #FFFFFF !important;
+    background: #FFFFFF !important;
     border: 1px solid #E2E8F0 !important;
     border-radius: 12px !important;
-    padding: 1rem !important;
+    padding: 0.75rem !important;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Style your Revenue Protection status blocks cleanly on the right column */
+/* Style status alerts and notifications safely without knocking them out of alignment */
 [data-testid="stNotification"] {
     background-color: #FFFFFF !important;
     border: 1px solid #E2E8F0 !important;
     border-radius: 12px !important;
     padding: 1.25rem !important;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
-    margin-bottom: 1.25rem !important; /* Adds professional spacing between alert blocks */
 }
 
-/* Target alert message headers specifically to match corporate clean fonts */
-[data-testid="stNotification"] p {
-    color: #334155 !important;
-    font-size: 0.95rem !important;
-    font-weight: 500 !important;
-    line-height: 1.5 !important;
+/* 4. SOLID BRAND ACTION BUTTONS */
+div.stButton > button:first-child {
+    background-color: #0F172A !important; /* Crisp charcoal corporate key */
+    color: #FFFFFF !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    padding: 0.65rem 2.2rem !important;
+    border-radius: 6px !important;
+    border: 1px solid #0F172A !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
 }
 
-/* 4. EXECUTIVE SELECTION ELEMENTS & INPUTS */
-section[data-testid="stSidebar"] label p, [data-testid="stMainBlockContainer"] label p {
-    font-size: 0.85rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.06em !important; /* Clean wide header look */
-    color: #475569 !important;
-    font-weight: 700 !important;
+div.stButton > button:first-child:hover {
+    background-color: #1E293B !important;
+    border-color: #1E293B !important;
+}
+
+/* Maintain smooth spacing gaps without pushing grid blocks */
+.element-container {
+    margin-bottom: 1.25rem !important;
 }
