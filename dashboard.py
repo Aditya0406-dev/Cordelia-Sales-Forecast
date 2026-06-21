@@ -303,16 +303,19 @@ if True in monsoon_df.columns and False in monsoon_df.columns:
     monsoon_df.columns = ['Route Destination', 'Dry Season Voyage Avg', 'Monsoon Voyage Avg']
     monsoon_df['Net Volume Lost'] = monsoon_df['Dry Season Voyage Avg'] - monsoon_df['Monsoon Voyage Avg']
     monsoon_df['Performance Deficit (%)'] = (monsoon_df['Net Volume Lost'] / (monsoon_df['Dry Season Voyage Avg'] + 1e-5)) * 100
-    col_tbl, col_alr = st.columns(2)
+    col_tbl, col_alr = st.columns([1.3, 1])
     with col_tbl:
         st.dataframe(monsoon_df.style.format({'Dry Season Voyage Avg': '{:.1f}', 'Monsoon Voyage Avg': '{:.1f}', 'Net Volume Lost': '{:.1f}', 'Performance Deficit (%)': '{:.2f}%'}), use_container_width=True, hide_index=True)
     with col_alr:
-        st.markdown("##### 🚨 Revenue Protection Adjustments")
+        st.markdown("##### ⚠️ Revenue Protection Adjustments")
         for _, row in monsoon_df.iterrows():
-            if row['Performance Deficit (%)'] > 15.0:
-                st.error(f"High Disruption on {row['Route Destination']}: Projections drop by {row['Performance Deficit (%)']:.1f}% during monsoon months. Shift fleet capacity layout.")
-            else:
-                st.success(f"Stable Transition on {row['Route Destination']}: Minimal weather impact noted ({row['Performance Deficit (%)']:.1f}% drop).")
+            with st.container(border=True):
+                if row['Performance Deficit (%)'] > 15.0:
+                    st.markdown(f"🚨 <span style='color:#FF1744;'><b>High Disruption on {row['Route Destination']}</b></span>", unsafe_allow_html=True)
+                    st.caption(f"Projections drop by {row['Performance Deficit (%)']:.1f}% during monsoon months. Shift fleet capacity layout.")
+                else:
+                    st.markdown(f"🟢 <b>Stable Transition on {row['Route Destination']}</b>", unsafe_allow_html=True)
+                    st.caption(f"Minimal weather impact noted ({row['Performance Deficit (%)']:.1f}% drop).")
 
 st.markdown("---")
 st.markdown("##### 📈 Interactive Predictive Timeline Chart")
