@@ -1,5 +1,5 @@
 /* ==============================================================================
-   🏢 FINVECTOR CORPORATE MINIMALISM OVERRIDE (SAFE SIDEBAR LAYOUT)
+   🏢 FINVECTOR CORPORATE STYLE SHEET (FIXED SIDEBAR TOGGLE UTILITY)
    ============================================================================== */
 
 /* 1. SEAMLESS WORKSPACE CANVAS */
@@ -8,14 +8,33 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
 }
 
-/* Let the wide dashboard layout breathe naturally without crashing grid elements */
+/* Let the wide dashboard layout breathe naturally without crushing grid elements */
 [data-testid="stMainBlockContainer"] {
     max-width: 1400px !important;
     padding: 2.5rem 2rem !important;
 }
 
-/* Hide native Streamlit engineering headers and bottom footer credits */
-header[data-testid="stHeader"], #MainMenu, footer {
+/* FIXED: Hide the top header bar background, but KEEP the toggle buttons active */
+header[data-testid="stHeader"] {
+    background-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Force the sidebar collapse/expand toggle buttons to remain completely visible */
+header[data-testid="stHeader"] button, 
+[data-testid="stSidebarCollapseButton"] {
+    visibility: visible !important;
+    display: inline-flex !important;
+    color: #0F172A !important; /* Dark corporate gray button icon */
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 6px !important;
+    z-index: 999999 !important;
+}
+
+/* Hide raw developer options menus and footer credits */
+#MainMenu, footer {
     visibility: hidden !important;
     display: none !important;
 }
@@ -25,7 +44,6 @@ section[data-testid="stSidebar"] {
     background-color: #FFFFFF !important;
     border-right: 1px solid #E2E8F0 !important;
     box-shadow: none !important;
-    display: block !important; /* Force sidebar visibility */
 }
 
 /* Style the Global Controls Header on your sidebar panel */
