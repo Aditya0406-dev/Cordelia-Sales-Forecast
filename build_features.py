@@ -14,8 +14,11 @@ output_path = os.path.join(output_dir, "processed_features.csv")
 
 print("[PROCESS] Connecting to database to extract raw historical data...")
 
-# 2. FIXED: Removed hardcoded plaintext password. Uses a secure environment variable fallback.
-db_password = os.environ.get("DB_PASSWORD", "aditya@0406")
+# 2. FIXED: Removed hardcoded plaintext password. Uses a secure environment variable fallback
+db_password = os.environ.get("DB_PASSWORD")
+
+if not db_password:
+    raise ValueError("CRITICAL COMPLIANCE FAILURE: 'DB_PASSWORD' environment context is unconfigured. Execution stopped.")
 
 connection = pymysql.connect(
     host="localhost",
