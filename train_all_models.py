@@ -73,45 +73,19 @@ def execute_pipeline():
                 
                 try:
                     df_prophet = pd.DataFrame()
-                    if len(df_filtered) >= 5:
+                    if len(df_filtered) >= 30:
                         df_prophet['ds'] = pd.to_datetime(df_filtered[DS_COL])
                         df_prophet['y'] = pd.to_numeric(df_filtered[TARGET_COL])
                         df_prophet = df_prophet.groupby('ds', as_index=False).mean()
                         df_prophet = df_prophet.replace([np.inf, -np.inf], np.nan).dropna(subset=['y'])
 
-                    # --- COLD-START FALLBACK ENGINE FOR THE SEASONAL MODELS ---
-                    if len(df_prophet) < 5:
-                        print(f"[{run_index}] 🔄 COLD START GENERATION -> Matrix Key: {model_key}")
-                        base_date = pd.to_datetime(df[DS_COL]).max() if not df.empty else datetime.now()
-                        future_dates = pd.date_range(start=base_date, periods=90, freq='D')
-                        
-                        # Apply weight-based baseline booking constants depending on luxury tier scaling
-                        fallback_val = 0.18 if 'SUITE' in c else (0.35 if 'BALCONY' in c else 0.55)
-                        
-                        # 🎯 DYNAMIC CORRECTIVE LAYER: Uses your precise historical error rates (1.2% - 1.3%)
-                        # Fallback to an industry-aligned 1.25% if no historical baseline has been processed yet
-                        dynamic_mape = round(np.mean([f['evaluation_mape'] for f in all_forecasts if f['evaluation_mape'] < 10.0]), 2) if any(f['evaluation_mape'] < 10.0 for f in all_forecasts) else 1.28
-                        
-                        for f_date in future_dates:
-                            all_forecasts.append({
-                                "model_key": model_key,
-                                "sailing_date": f_date.strftime('%Y-%m-%d'),
-                                "forecasted_bookings": float(fallback_val),
-                                "forecast_lower": float(fallback_val * 0.8),
-                                "forecast_upper": float(fallback_val * 1.2),
-                                "evaluation_mape": dynamic_mape  # 🟢 Replaced 14.5 with your exact 1.2% - 1.3% baseline
-                            })
-                        
-                        try:
-                            with mlflow.start_run(run_name=f"Run_{model_key}_ColdStart"):
-                                mlflow.log_params({"route": str(r), "ship": str(s), "cabin": str(c), "engine_mode": "ColdStart_Fallback"})
-                                mlflow.log_metrics({"test_mape": dynamic_mape}) # 🟢 Logs the clean accuracy directly to MLflow
-                        except Exception:
-                            pass
-                            
-                        success_count += 1
-                        run_index += 1
-                        continue
+                    # FIXED (Item 7): Log row count per model segment
+                    segment_row_count = len(df_prophet)
+                    print(f"[METRIC] Route Segment: {model_key} | Total Historical Rows: {segment_row_count}")
+
+                    # FIXED (Item 6 & 7): Fail if data has less than 30 points. No fake fallback values or 1.28% MAPE.
+                    if segment_row_count < 30:
+                        raise ValueError(f"CRITICAL ERROR: Segment model {model_key} has less than 30 data points ({segment_row_count} found). Training stopped.")
 
                     # --- NATIVE PROPHET ENGINE WITH CRUISE BUSINESS MATH (Page 8) ---
                     model = Prophet(
