@@ -12,14 +12,26 @@ import sqlite3
 # =============================================================================
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+db_file_path = os.path.join(CURRENT_DIR, "mlflow.db")
 
-# Safely extract validation flag directly from the deployment runtime environment
-if "MLOPS_ACTIVE" in st.secrets:
-    MLOPS_ENGINE_ACTIVE = bool(st.secrets["MLOPS_ACTIVE"])
+MLOPS_ENGINE_ACTIVE = False
+
+# Physically inspect the root folder for the real database asset
+if os.path.exists(db_file_path):
+    try:
+        # Open in safe read-only URI mode to comply with Streamlit Cloud restriction rules
+        conn = sqlite3.connect(f"file:{db_file_path}?mode=ro", uri=True)
+        
+        # Test query ensuring standard MLflow tables are alive and populated
+        test_df = pd.read_sql_query("SELECT 1 FROM experiments LIMIT 1;", conn)
+        conn.close()
+        
+        # Connection status lights up green ONLY if the asset is verified and readable
+        MLOPS_ENGINE_ACTIVE = True
+    except Exception:
+        MLOPS_ENGINE_ACTIVE = False
 else:
-    # Safe fallback if secrets are uninitialized during deployment
     MLOPS_ENGINE_ACTIVE = False
-
 
 
 # ==============================================================================
