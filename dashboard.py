@@ -12,11 +12,19 @@ try:
     import xgboost as xgb
     import lightgbm as lgb
     import mlflow
-    mlflow.set_tracking_uri("sqlite:///mlflow.db")
+    
+    # Force an absolute path calculation for Streamlit Cloud's Linux environment
+    db_absolute_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mlflow.db")
+    mlflow.set_tracking_uri(f"sqlite:///{db_absolute_path}")
+    
+    # Test connection
     mlflow.search_experiments()
     MLOPS_ENGINE_ACTIVE = True
-except Exception:
+    connection_error_msg = ""
+except Exception as e:
     MLOPS_ENGINE_ACTIVE = False
+    connection_error_msg = str(e)
+
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -59,7 +67,8 @@ st.sidebar.subheader("Cordelia Forecasting Suite")
 if MLOPS_ENGINE_ACTIVE:
     st.sidebar.success("✅ Connected to Live MLflow Production Registry")
 else:
-    st.sidebar.error("⚠️ MLflow Registry Offline / Disconnected")
+    st.sidebar.error(f"⚠️ MLflow Registry Offline\n\nError: {connection_error_msg}")
+
 
 st.sidebar.markdown("---")
 
