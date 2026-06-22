@@ -133,9 +133,9 @@ def execute_pipeline():
                         all_forecasts.append({
                             "model_key": model_key,
                             "sailing_date": row['ds'].strftime('%Y-%m-%d'),
-                            "forecasted_bookings": float(row['yhat']),
-                            "forecast_lower": float(row['yhat_lower']),
-                            "forecast_upper": float(row['yhat_upper']),
+                            "forecasted_bookings": max(0, int(round(row['yhat']))),
+                            "forecast_lower": max(0, int(round(row['yhat_lower']))),
+                            "forecast_upper": max(0, int(round(row['yhat_upper']))),
                             "evaluation_mape": round(mape, 2)
                         })
                         
