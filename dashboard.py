@@ -217,7 +217,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
         st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
         
         # Define Section 1.2 compliant arrays to loop over all 48 models
-        routes = ["MUM-GOA", "MUM-LAK", "MUM-HI-SEAS", "KCH-LAK", "CHN-VIZ", "MUM-WASIA"]
+        routes = ["MUM-GOA", "MUM-LAK", "MUM-HS", "KOCHI-LAK", "CHN-VIZ-PUD", "MUM-WA"]
         ships = ["EMPRESS", "SKY"]
         cabins = ["BALCONY", "INTERIOR", "SEA_VIEW", "SUITE"]
 
