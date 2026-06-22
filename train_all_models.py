@@ -11,7 +11,8 @@ from datetime import datetime
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # If final_engineered_features.csv is in the SAME folder as this script:
-CSV_PATH = os.path.join(CURRENT_DIR, "final_engineered_features.csv")
+CSV_PATH = os.path.join(CURRENT_DIR, "features", "final_engineered_features.csv")
+
 
 # This saves forecast_results.csv in the SAME folder as this script:
 OUTPUT_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
