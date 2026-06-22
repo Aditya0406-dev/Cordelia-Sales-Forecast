@@ -197,9 +197,6 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
     # --------------------------------------------------------------------------
     # PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW WITH COMPLIANT ROUTE KPI CARDS
     # --------------------------------------------------------------------------
-        # --------------------------------------------------------------------------
-    # PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW WITH COMPLIANT ROUTE KPI CARDS
-    # --------------------------------------------------------------------------
     elif page == "2. Route & Cabin Yield Matrix":
         st.title("🧮 Route & Cabin Yield Matrix")
         st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
@@ -290,7 +287,8 @@ elif page == "3. Scenario Planning (Fleet Expansion)":
         "Select Target Route for Fleet Expansion:",
         ["MUM-GOA", "MUM-LAK", "MUM-HS", "KOCHI-LAK", "CHN-VIZ-PUD", "MUM-WA"]
     )
-    vessel_capacity = st.slider("Vessel Capacity Bound (PAX)", min_value=500, max_value=3000, value=2000, step=100)
+    vessel_capacity = st.slider("Vessel Capacity Bound (PAX)", min_value=500, max_value=3000, value=2000, step=100, key="persistent_vessel_capacity")
+
     
     st.subheader("⛈️ Seasonal Disruption Risk Engine")
     monsoon_toggle = st.toggle("Enable Monsoon Disruption Impact Simulation (50% Load Suppression)")
@@ -312,7 +310,7 @@ elif page == "3. Scenario Planning (Fleet Expansion)":
     sim_pax_base = vessel_capacity * selected_factor
     
     # Apply monsoon adjustments dynamically based on route vulnerability rules
-    if monsoon_toggle and target_expansion_route in ["MUM-LAK", "KCH-LAK"]:
+    if monsoon_toggle and target_expansion_route in ["MUM-LAK", "KOCHI-LAK"]:
         sim_pax_final = int(sim_pax_base * 0.50)
         st.warning(f"⚠️ Monsoon suppression factor applied. Expected island route load restricted by 50%.")
     else:
