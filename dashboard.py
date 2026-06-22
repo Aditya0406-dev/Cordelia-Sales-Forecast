@@ -203,11 +203,14 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
     # --------------------------------------------------------------------------
     # PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW WITH COMPLIANT ROUTE KPI CARDS
     # --------------------------------------------------------------------------
+        # --------------------------------------------------------------------------
+    # PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW WITH COMPLIANT ROUTE KPI CARDS
+    # --------------------------------------------------------------------------
     elif page == "2. Route & Cabin Yield Matrix":
         st.title("🧮 Route & Cabin Yield Matrix")
         st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
         
-        # Define Section 1.2 compliant arrays to loop over all 48 models
+        # Section 1.2 compliant arrays
         routes = ["MUM-GOA", "MUM-LAK", "MUM-HI-SEAS", "KCH-LAK", "CHN-VIZ", "MUM-WASIA"]
         ships = ["EMPRESS", "SKY"]
         cabins = ["BALCONY", "INTERIOR", "SEA_VIEW", "SUITE"]
@@ -226,12 +229,10 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             display_df["Highlight Status"] = np.where(display_df["Route Code"] == selected_route, "🎯 Focused Target", "Background Segment")
             filtered_df = display_df[display_df["Route Code"] == selected_route].copy()
             
-            # ==============================================================================
-            # ROUTE SPECIFIC DYNAMIC KPI CARDS (RESTORED SIMULATION LOGIC)
-            # ==============================================================================
+            # ROUTE SPECIFIC DYNAMIC KPI CARDS
             st.markdown(f"#### 📊 Performance Summary Matrix for Route Segment: **{selected_route}**")
             
-            # Aggregate sums matching strictly the selected route's 8 active model combinations
+            # Aggregate sums directly from the filtered dataframe rows (No syntax gaps)
             route_sim_pax = int(filtered_df["Simulated Booking"].sum())
             route_sim_revenue = filtered_df["Simulated Revenue"].sum()
             
@@ -239,7 +240,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             route_pax_delta = route_sim_pax - route_base_pax
             route_delta_str = f"{route_pax_delta:+,} seats shift" if route_pax_delta != 0 else "Baseline Stable"
             
-            # Display responsive segment metric cards on top of the grid
+            # Display metrics panels dynamically
             col_kpi1, col_kpi2 = st.columns(2)
             with col_kpi1:
                 st.metric(
@@ -256,7 +257,6 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 )
             
             st.markdown("---")
-            # Render the filtered 8-model submatrix view grid
             st.dataframe(
                 filtered_df.drop(columns=["Raw Rate"]),
                 use_container_width=True,
