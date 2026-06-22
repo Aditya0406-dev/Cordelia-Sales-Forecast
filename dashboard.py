@@ -206,13 +206,13 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
         st.subheader("🔍 Select Target Model Filter Focus")
         selected_route = st.selectbox("Filter Display Segment by Route Code", ["ALL FLEET COMBINATIONS"] + routes)
 
-        # Route isolation filtering structure
-    if selected_route != "ALL FLEET COMBINATIONS":
-        df_base_fleet["Highlight Status"] = np.where(df_base_fleet["Route Code"] == selected_route, "🎯 Focused Target", "Background Segment")
-        display_df = df_base_fleet[df_base_fleet["Route Code"] == selected_route].copy()
-    else:
-        df_base_fleet["Highlight Status"] = "Global Fleet Context"
-        display_df = df_base_fleet.copy()
+    # Route isolation filtering structure
+        if selected_route != "ALL FLEET COMBINATIONS":
+            df_base_fleet["Highlight Status"] = np.where(df_base_fleet["Route Code"] == selected_route, "🎯 Focused Target", "Background Segment")
+            display_df = df_base_fleet[df_base_fleet["Route Code"] == selected_route].copy()
+        else:
+            df_base_fleet["Highlight Status"] = "Global Fleet Context"
+            display_df = df_base_fleet.copy()
 
             
     # Apply currency metrics dynamically
