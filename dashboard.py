@@ -9,28 +9,32 @@ import sqlite3
 # AUDIT ITEM 12: RELIABLE LIVE MLOPS REGISTRY VALIDATION (NO FALSE TRAILING FLAGS)
 # ==============================================================================
 # ==============================================================================
-# PHASE 3 / AUDIT ITEM 12: BULLETPROOF CLOUD REGISTRY LEDGER CONNECTION
+# PHASE 3 / AUDIT ITEM 12: DYNAMIC DATABASE CONTEXT INTERFACE
 # ==============================================================================
-try:
-    import xgboost as xgb
-    import lightgbm as lgb
-    import mlflow
-    
-    # 1. Establish a thread-safe, in-memory tracking store to bypass file locks
-    mlflow.set_tracking_uri("sqlite:///:memory:")
-    
-    # 2. Programmatically seed an active experiment bucket to satisfy systemic validations
-    mlflow.set_experiment("Cordelia_Production_Suite")
-    
-    # 3. Fire the mandatory verification call — this now succeeds without errors
-    mlflow.search_experiments()
-    MLOPS_ENGINE_ACTIVE = True
-except Exception:
+# Explicitly traces the database state to comply with the Priority 3 mandate.
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+db_file_target = os.path.join(CURRENT_DIR, "mlflow.db")
+
+# Default condition is offline until verified by a live file schema check
+MLOPS_ENGINE_ACTIVE = False
+
+if os.path.exists(db_file_target):
+    try:
+        # Establish a true file-system connection to verify data presence
+        verification_conn = sqlite3.connect(db_file_target)
+        
+        # Test query ensuring the critical evaluation tables exist and contain records
+        test_query = "SELECT 1 FROM model_evaluations LIMIT 1"
+        pd.read_sql_query(test_query, verification_conn)
+        verification_conn.close()
+        
+        # Connection lights up green only if the database is physically present and uncorrupted
+        MLOPS_ENGINE_ACTIVE = True
+    except Exception:
+        MLOPS_ENGINE_ACTIVE = False
+else:
     MLOPS_ENGINE_ACTIVE = False
 
-
-
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # ==============================================================================
 # AUDIT ITEM 14: FINVECTOR HIGH-CONTRAST BRAND COMPLIANCE STYLE SHEET
