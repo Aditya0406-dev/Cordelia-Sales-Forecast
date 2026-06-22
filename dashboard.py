@@ -272,8 +272,20 @@ elif page == "3. Scenario Planning (Fleet Expansion)":
     st.title("🔮 Scenario Planning & Fleet Expansion Workspace")
     st.info("Item 15 Compliant: Algorithmic capacity simulator running without synthetic multipliers.")
     
+    # --------------------------------------------------------------------------
+    # GLOBAL CURRENCY RE-DECLARATION TO PREVENT SCOPING ERRORS
+    # --------------------------------------------------------------------------
+    # Ensures Page 3 can access the shared currency symbols without crashing
+    currency_mode = st.radio("SELECT SIMULATION DISPLAY CURRENCY", ["INR (₹)", "USD ($)", "EUR (€)"], horizontal=True)
+    fx_symbols = {"INR (₹)": "₹", "USD ($)": "$", "EUR (€)": "€"}
+    fx_rates = {"INR (₹)": 1.0, "USD ($)": 0.012, "EUR (€)": 0.011}
+    
+    active_symbol = fx_symbols[currency_mode]
+    active_multiplier = fx_rates[currency_mode]
+
+    st.markdown("---")
     st.subheader("🚢 Simulate New Vessel Ingestion")
-    # Section 1.2 & 1.3 Audit Mandate: All 6 official routes available for expansion mapping
+    
     target_expansion_route = st.selectbox(
         "Select Target Route for Fleet Expansion:",
         ["MUM-GOA", "MUM-LAK", "MUM-HS", "KOCHI-LAK", "CHN-VIZ-PUD", "MUM-WA"]
@@ -283,63 +295,51 @@ elif page == "3. Scenario Planning (Fleet Expansion)":
     st.subheader("⛈️ Seasonal Disruption Risk Engine")
     monsoon_toggle = st.toggle("Enable Monsoon Disruption Impact Simulation (50% Load Suppression)")
     
-    if st.button("Run Expansion Simulation Scenario"):
-        # ==============================================================================
-        # ROUTE-SPECIFIC BASELINE LOAD FACTORS (SECTION 1.3 COMPLIANT)
-        # ==============================================================================
-        # Map specific utilization limits based on true route profile baselines
-        route_load_factors = {
-            "MUM-GOA": 0.88,      # High volume holiday hub
-            "MUM-LAK": 0.82,      # Island premium route
-            "MUM-HS": 0.75,   # Short weekend track
-            "KOCHI-LAK": 0.78,      # Southern island link
-            "CHN-VIZ-PUD": 0.80,      # East coast sector
-            "MUM-WA": 0.70     # Extended international route
-        }
+    # ==============================================================================
+    # ROUTE-SPECIFIC BASELINE LOAD FACTORS & FARES (DYNAMIC METRIC RE-CALCULATION)
+    # ==============================================================================
+    route_load_factors = {
+        "MUM-GOA": 0.88, "MUM-LAK": 0.82, "MUM-HS": 0.75,
+        "KOCHI-LAK": 0.78, "CHN-VIZ-PUD": 0.80, "MUM-WA": 0.70
+    }
+    
+    route_rates = {
+        "MUM-GOA": 9500.00, "MUM-LAK": 14200.00, "MUM-HI-SEAS": 8400.00,
+        "KOCHI-LAK": 12800.00, "CHN-VIZ-PUD": 11200.00, "MUM-WA": 24500.00
+    }
+    
+    selected_factor = route_load_factors.get(target_expansion_route, 0.80)
+    sim_pax_base = vessel_capacity * selected_factor
+    
+    # Apply monsoon adjustments dynamically based on route vulnerability rules
+    if monsoon_toggle and target_expansion_route in ["MUM-LAK", "KCH-LAK"]:
+        sim_pax_final = int(sim_pax_base * 0.50)
+        st.warning(f"⚠️ Monsoon suppression factor applied. Expected island route load restricted by 50%.")
+    else:
+        sim_pax_final = int(sim_pax_base)
         
-        # Pull the unique multiplier for the chosen route dropdown
-        selected_factor = route_load_factors.get(target_expansion_route, 0.80)
-        sim_pax_base = vessel_capacity * selected_factor
-        
-        # Apply seasonal weather suppression factor strictly to island routes
-        if monsoon_toggle and target_expansion_route in ["MUM-LAK", "KCH-LAK"]:
-            sim_pax_final = int(sim_pax_base * 0.50)
-            st.warning(f"⚠️ Monsoon suppression factor applied. Expected load for island route {target_expansion_route} restricted by 50%.")
-        else:
-            sim_pax_final = int(sim_pax_base)
-            
-        # Ticket fare variations per route class to ensure revenue isn't hardcoded flat
-        route_rates = {
-            "MUM-GOA": 9500.00,
-            "MUM-LAK": 14200.00,
-            "MUM-HS": 8400.00,
-            "KOCHI-LAK": 12800.00,
-            "CHN-VIZ": 11200.00,
-            "MUM-WA": 24500.00
-        }
-        
-        selected_rate = route_rates.get(target_expansion_route, 11200.00)
-        sim_revenue = sim_pax_final * selected_rate
-        
-        # Format the outputs completely in your active currency mode
-        converted_pax = sim_pax_final
-        converted_rev = sim_revenue * rate_multiplier
-        
-        # Display clear side-by-side scenario simulation summary cards
-        st.markdown(f"#### 🔮 Projections for Adding Vessel to: **{target_expansion_route}**")
-        scol1, scol2 = st.columns(2)
-        with scol1:
-            st.metric(
-                label=f"Projected Incremental Capacity ({target_expansion_route})", 
-                value=f"{converted_pax:,} PAX",
-                delta=f"{int(selected_factor*100)}% Baseline Load"
-            )
-        with scol2:
-            st.metric(
-                label="Simulated Incremental Revenue Yield", 
-                value=f"{symbol}{converted_rev:,.2f}",
-                delta=f"Avg Fare: {symbol}{selected_rate * rate_multiplier:,.2f}"
-            )
+    selected_rate = route_rates.get(target_expansion_route, 11200.00)
+    sim_revenue = sim_pax_final * selected_rate
+    
+    # Apply currency conversions safely at runtime
+    converted_pax = sim_pax_final
+    converted_rev = sim_revenue * active_multiplier
+    
+    # Render the dynamic layout cards outside the button block so they update immediately
+    st.markdown(f"#### 🔮 Real-Time Projections for Vessel Addition: **{target_expansion_route}**")
+    scol1, scol2 = st.columns(2)
+    with scol1:
+        st.metric(
+            label=f"Projected Incremental Capacity ({target_expansion_route})", 
+            value=f"{converted_pax:,} PAX",
+            delta=f"{int(selected_factor*100)}% Baseline Load Factor"
+        )
+    with scol2:
+        st.metric(
+            label="Simulated Incremental Revenue Yield", 
+            value=f"{active_symbol}{converted_rev:,.2f}",
+            delta=f"Avg Route Fare: {active_symbol}{selected_rate * active_multiplier:,.2f}"
+        )
 
 
 elif page == "4. Model Performance & Validation":
