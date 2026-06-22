@@ -283,7 +283,7 @@ elif page == "3. Scenario Planning (Fleet Expansion)":
     st.markdown("---")
     st.subheader("🚢 Simulate New Vessel Ingestion")
     
-       target_expansion_route = st.selectbox(
+    target_expansion_route = st.selectbox(
         "Select Target Route for Fleet Expansion:",
         ["MUM-GOA", "MUM-LAK", "MUM-HS", "KOCHI-LAK", "CHN-VIZ-PUD", "MUM-WA"]
     )
