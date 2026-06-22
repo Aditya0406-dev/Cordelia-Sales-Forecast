@@ -138,7 +138,7 @@ elif page == "2. Route & Cabin Yield Matrix":
         "Route Code": ["CHN-VIZ-PUD", "CHN-VIZ-PUD", "CHN-VIZ-PUD", "CHN-VIZ-PUD"],
         "Vessel ID": ["EMPRESS", "EMPRESS", "EMPRESS", "EMPRESS"],
         "Cabin Tier": ["Balcony Suite", "Standard Interior Cabin", "Ocean View Cabin", "Premium Luxury Suite"],
-        "Base Booking":
+        "Base Booking": [0, 52, 0, 0],
     }
     
     df = pd.DataFrame(matrix_data)
