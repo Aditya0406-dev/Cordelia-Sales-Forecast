@@ -381,7 +381,7 @@ else:
 # ==============================================================================
 # ITEM 15 COMPLIANT WORKSPACES: PAGES 3 & 4 (ZERO HARDCODED VALUE INJECTIONS)
 # ==============================================================================
-elif page == "3. Scenario Planning (Fleet Expansion)":
+if page == "3. Scenario Planning (Fleet Expansion)":
     st.title("🔮 Scenario Planning & Fleet Expansion Workspace")
     st.info("Item 15 Compliant: Algorithmic capacity simulator running without synthetic scaling multipliers.")
     
