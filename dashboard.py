@@ -288,8 +288,9 @@ if st.session_state.show_matrix_toggle:
     
     st.markdown("### 💵 Complete Fleet Optimization & Yield Matrix")
     global_summary = df_global.groupby([key_col, 'Route_Dim', 'Ship_Dim', 'Cabin_Dim']).agg({'true_bookings': 'sum', 'simulated_bookings': 'sum', 'baseline_revenue_inr': 'sum', 'simulated_revenue_inr': 'sum'}).reset_index()
-    global_summary['Baseline RevPAX'] = (global_summary['baseline_revenue_inr'] * conversion_rate) / 2000.0
-    global_summary['Simulated RevPAX'] = (global_summary['simulated_revenue_inr'] * conversion_rate) / 2000.0
+    global_summary['Baseline RevPAX'] = (global_summary['baseline_revenue_inr'] * conversion_rate) / (global_summary['true_bookings'] + 1e-5)
+    global_summary['Simulated RevPAX'] = (global_summary['simulated_revenue_inr'] * conversion_rate) / (global_summary['simulated_bookings'] + 1e-5)
+
     grid_display = global_summary[[key_col, 'Route_Dim', 'Ship_Dim', 'Cabin_Dim', 'true_bookings', 'simulated_bookings', 'Baseline RevPAX', 'Simulated RevPAX']]
     grid_display.columns = ['Model Matrix Key', 'Sea Route Code', 'Vessel ID', 'Cabin Tier', 'Baseline Bookings', 'Simulated Bookings', 'Baseline RevPAX', 'Simulated RevPAX']
     st.dataframe(grid_display.style.format({'Baseline Bookings': '{:,.0f}', 'Simulated Bookings': '{:,.0f}', 'Baseline RevPAX': f'{active_symbol}' + '{:,.2f}', 'Simulated RevPAX': f'{active_symbol}' + '{:,.2f}'}), use_container_width=True, hide_index=True)
