@@ -283,11 +283,36 @@ elif page == "3. Scenario Planning (Fleet Expansion)":
     st.markdown("---")
     st.subheader("🚢 Simulate New Vessel Ingestion")
     
-    target_expansion_route = st.selectbox(
+       target_expansion_route = st.selectbox(
         "Select Target Route for Fleet Expansion:",
         ["MUM-GOA", "MUM-LAK", "MUM-HS", "KOCHI-LAK", "CHN-VIZ-PUD", "MUM-WA"]
     )
-    vessel_capacity = st.slider("Vessel Capacity Bound (PAX)", min_value=500, max_value=3000, value=2000, step=100, key="persistent_vessel_capacity")
+
+    # ==============================================================================
+    # DYNAMIC VESSEL CAPACITY INGESTION BASES (SECTION 1.3 REALISM)
+    # ==============================================================================
+    # Automatically map realistic fleet default starting caps based on route demand profiles
+    route_default_capacities = {
+        "MUM-GOA": 2500,      # Large high-volume flagship vessel
+        "MUM-LAK": 1800,      # Premium mid-size island vessel
+        "MUM-HS": 2000,   # High-density weekend cruiser
+        "KOCHI-LAK": 1200,      # Boutique regional island connection
+        "CHN-VIZ-PUD": 1600,      # Standard coastal sector vessel
+        "MUM-WA": 1500     # Long-haul international luxury liner
+    }
+    
+    # Extract the dynamic default based on the active dropdown route selection
+    dynamic_default_cap = route_default_capacities.get(target_expansion_route, 2000)
+
+    # Render the slider completely linked to the route-specific context rules
+    vessel_capacity = st.slider(
+        "Vessel Capacity Bound (PAX)", 
+        min_value=500, 
+        max_value=3000, 
+        value=dynamic_default_cap, 
+        step=100, 
+        key=f"vessel_cap_{target_expansion_route}" # Unique dynamic key prevents layout state crashes
+    )
 
     
     st.subheader("⛈️ Seasonal Disruption Risk Engine")
@@ -302,7 +327,7 @@ elif page == "3. Scenario Planning (Fleet Expansion)":
     }
     
     route_rates = {
-        "MUM-GOA": 9500.00, "MUM-LAK": 14200.00, "MUM-HI-SEAS": 8400.00,
+        "MUM-GOA": 9500.00, "MUM-LAK": 14200.00, "MUM-HS": 8400.00,
         "KOCHI-LAK": 12800.00, "CHN-VIZ-PUD": 11200.00, "MUM-WA": 24500.00
     }
     
