@@ -71,7 +71,7 @@ st.sidebar.subheader("Cordelia Forecasting Suite")
 if MLOPS_ENGINE_ACTIVE:
     st.sidebar.success("✅ Connected to Live MLflow Production Registry")
 else:
-    st.sidebar.error(f"⚠️ MLflow Registry Offline\n\nError: {connection_error_msg}")
+    st.sidebar.error("⚠️ MLflow Registry Offline\n\nError: ")
 
 
 st.sidebar.markdown("---")
