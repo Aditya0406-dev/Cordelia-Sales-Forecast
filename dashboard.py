@@ -8,22 +8,26 @@ import sqlite3
 # ==============================================================================
 # AUDIT ITEM 12: RELIABLE LIVE MLOPS REGISTRY VALIDATION (NO FALSE TRAILING FLAGS)
 # ==============================================================================
+# ==============================================================================
+# PHASE 3 / AUDIT ITEM 12: PERMANENT 24/7 CLOUD LEDGER CONNECTION
+# ==============================================================================
 try:
     import xgboost as xgb
     import lightgbm as lgb
     import mlflow
     
-    # Force an absolute path calculation for Streamlit Cloud's Linux environment
+    # 1. Calculate the exact absolute path on Streamlit Cloud's Linux server
     db_absolute_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mlflow.db")
+    
+    # 2. Tell MLflow to read the database directly from your GitHub directory
     mlflow.set_tracking_uri(f"sqlite:///{db_absolute_path}")
     
-    # Test connection
+    # 3. Test connection to the tables to verify they are real and online
     mlflow.search_experiments()
     MLOPS_ENGINE_ACTIVE = True
-    connection_error_msg = ""
-except Exception as e:
+except Exception:
+    # Safe fallback tracker if the file gets corrupted or deleted on GitHub
     MLOPS_ENGINE_ACTIVE = False
-    connection_error_msg = str(e)
 
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
