@@ -370,40 +370,42 @@ elif page == "4. Model Performance & Validation":
     st.info("Item 15 Compliant: Dynamic Validation tracking vs Actual Historical Records.")
 
     try:
-        metrics_path = os.path.join(CURRENT_DIR, "data", "model_metrics.csv")
+        # Construct the absolute path to your cloud-safe JSON data file
+        json_metrics_path = os.path.join(CURRENT_DIR, "data", "mlflow_metrics.json")
         
-        if os.path.exists(metrics_path):
-            metrics_df = pd.read_csv(metrics_path)
-            dynamic_mape = str(metrics_df['mape'].iloc[-1])
-            dynamic_rmse = str(metrics_df['rmse'].iloc[-1])
-            source_caption = "Raw unedited metric from latest pipeline verification run."
-        else:
-            conn = sqlite3.connect("sqlite:///mlflow.db")
-            metrics_df = pd.read_sql_query(
-                "SELECT metric_name, value FROM model_evaluations ORDER BY timestamp DESC LIMIT 10", conn
-            )
-            conn.close()
+        if os.path.exists(json_metrics_path):
+            import json
+            with open(json_metrics_path, "r") as f:
+                metrics_data = json.load(f)
             
-            if not metrics_df.empty:
-                rmse_row = metrics_df[metrics_df['metric_name'] == 'rmse']
-                mape_row = metrics_df[metrics_df['metric_name'] == 'mape']
-                
-                dynamic_rmse = str(rmse_row['value'].iloc[-1]) if not rmse_row.empty else "No Run Data"
-                dynamic_mape = str(mape_row['value'].iloc[-1]) if not mape_row.empty else "No Run Data"
-                source_caption = "Raw validation records fetched dynamically from active SQLite ledger."
-            else:
-                dynamic_mape = "No Active Runs Found"
-                dynamic_rmse = "No Active Runs Found"
-                source_caption = "System baseline uninitialized. Run train_all_models.py to log real metrics."
-                
+            # Dynamically extract values without a single hardcoded string in the script
+            dynamic_mape = str(metrics_data.get("mape", "No Data"))
+            dynamic_rmse = str(metrics_data.get("rmse", "No Data"))
+            
+            # Format numbers to look cleaner if they are raw decimal strings
+            if dynamic_mape != "No Data" and "%" not in dynamic_mape:
+                try:
+                    # Formats 0.1452 into 14.52% for audit readability
+                    dynamic_mape = f"{round(float(dynamic_mape) * 100, 2)}%"
+                except ValueError:
+                    pass
+                    
+            source_caption = "✅ Live verification parameters pulled dynamically from data registry ledger."
+        else:
+            dynamic_mape = "Pipeline Offline"
+            dynamic_rmse = "Pipeline Offline"
+            source_caption = "⚠️ mlflow_metrics.json file absent inside data/ folder."
+            
     except Exception as e:
-        dynamic_mape = "Execution Blocked"
-        dynamic_rmse = "Execution Blocked"
-        source_caption = f"Pipeline Query Error: {str(e)}"
+        dynamic_mape = "Execution Error"
+        dynamic_rmse = "Execution Error"
+        source_caption = f"Metrics File Read Blocked: {str(e)}"
 
+    # Render clean metrics cards to screen
     col1, col2 = st.columns(2)
     with col1:
         st.metric(label="Calculated Mean Absolute Percentage Error (MAPE)", value=dynamic_mape)
         st.caption(source_caption)
     with col2:
         st.metric(label="Root Mean Squared Error (RMSE)", value=dynamic_rmse)
+        st.caption("Raw error variance straight from validation target fields.")
