@@ -331,6 +331,21 @@ if len(df_chart_data) > 0:
         elif trace.name == 'simulated_bookings':
             trace.line.color = ACCENT_ORANGE
             trace.name = 'Simulated Projection Scenario'
+                    
+        # FIXED (Priority 4, Item 15): Inject dynamic shaded confidence interval bounds from Prophet arrays
+        if 'forecast_lower' in df_chart_data.columns and 'forecast_upper' in df_chart_data.columns:
+            import plotly.graph_objects as go
+            fig.add_trace(go.Scatter(
+                x=pd.concat([df_chart_data[date_col], df_chart_data[date_col][::-1]]),
+                y=pd.concat([df_chart_data['forecast_upper'], df_chart_data['forecast_lower'][::-1]]),
+                fill='toself',
+                fillcolor='rgba(100, 24, 158, 0.08)', # Translucent corporate brand purple shading
+                line=dict(color='rgba(255,255,255,0)'),
+                hoverinfo="skip",
+                showlegend=True,
+                name="95% Forecast Confidence Boundary"
+            ))
+
     fig.update_traces(mode="lines+markers", hovertemplate="Scenario: %{name}<br>Date: %{x}<br>PAX Count: %{y:,.0f}")
     fig.update_layout(hovermode="x unified", legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
     st.plotly_chart(fig, use_container_width=True)
