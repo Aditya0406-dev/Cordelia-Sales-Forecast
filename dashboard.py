@@ -23,8 +23,8 @@ DB_PATH = os.path.join(CURRENT_DIR, "cordelia_enterprise.db")
 # 1. NEW FIXED LOCATION: Move this here to force the sidebar to display
 st.set_page_config(page_title="Cordelia Cruise Enterprise Sales Forecast", layout="wide")
 
-PRIMARY_PURPLE = "#4A148C"
-ACCENT_ORANGE = "#FF1744"
+PRIMARY_PURPLE = "#64189E"  # Official FinVector Brand Purple
+ACCENT_ORANGE = "#F1723F"   # Official FinVector Brand Orange
 
 # --- CLEAN LAYOUT LOADER ---
 def load_css(file_name):
