@@ -96,7 +96,7 @@ for r in routes:
                 "Route Key": model_key,
                 "Route Code": r,
                 "Vessel ID": s,
-                "Cabin Tier": f"{c.replace('_', ' ').title()} Suite" if c=="BALCONY" else c.replace('_', ' ').title(),
+                "Cabin Tier": c.replace('_', ' ').title(),
                 "Base Booking": base_b,
                 "Base Revenue": base_r,
                 "Raw Rate": rate_map[c]
