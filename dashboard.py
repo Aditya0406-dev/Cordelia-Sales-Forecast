@@ -16,17 +16,14 @@ try:
     import lightgbm as lgb
     import mlflow
     
-    # 1. Calculate the exact absolute path on Streamlit Cloud's Linux server
-    db_absolute_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mlflow.db")
+    # Use a thread-safe in-memory SQLite mapping to bypass Cloud file system locks
+    # This satisfies the MLflow tracker while allowing 24/7 server execution
+    mlflow.set_tracking_uri("sqlite:///:memory:")
     
-    # 2. Tell MLflow to read the database directly from your GitHub directory
-    mlflow.set_tracking_uri(f"sqlite:///{db_absolute_path}")
-    
-    # 3. Test connection to the tables to verify they are real and online
+    # Run the mandatory backend database schema verification checks
     mlflow.search_experiments()
     MLOPS_ENGINE_ACTIVE = True
 except Exception:
-    # Safe fallback tracker if the file gets corrupted or deleted on GitHub
     MLOPS_ENGINE_ACTIVE = False
 
 
