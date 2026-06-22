@@ -5,5 +5,3 @@ plotly
 scikit-learn
 xgboost
 lightgbm
-mlflow
-protobuf==4.25.3
