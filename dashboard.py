@@ -103,13 +103,13 @@ if not key_col or not date_col or not target_col:
 
 df_global[date_col] = pd.to_datetime(df_global[date_col], errors='coerce')
 df_global = df_global.dropna(subset=[date_col])
-df_global['true_bookings'] = (pd.to_numeric(df_global[target_col], errors='coerce').fillna(0) * 1000).astype(int)
+df_global['true_bookings'] = pd.to_numeric(df_global[target_col], errors='coerce').fillna(0).astype(int)
 
 def extract_matrix_dimensions(df):
     splits = df[key_col].astype(str).str.split('_')
     df['Route_Dim'] = splits.apply(lambda x: x[0] if isinstance(x, list) and len(x) > 0 else 'Unknown')
     df['Ship_Dim'] = splits.apply(lambda x: x[1] if isinstance(x, list) and len(x) > 1 else 'EMPRESS')
-    df['Cabin_Dim'] = splits.apply(lambda x: x[2] if isinstance(x, list) and len(x) > 2 else 'INTERIOR')
+    df['Cabin_Dim'] = splits.apply(lambda x: "_".join(x[2:]) if isinstance(x, list) and len(x) > 2 else 'INTERIOR')
     return df
 
 df_global = extract_matrix_dimensions(df_global)
@@ -130,6 +130,7 @@ df_global['base_fare'] = df_global['Cabin_Dim'].map({
 }).fillna(10000)
 
 df_global['baseline_revenue_inr'] = df_global['true_bookings'] * df_global['base_fare']
+
 
 st.markdown("##### ⚙️ Enterprise Reporting Configuration")
 currency_select = st.radio("Select Reporting Currency (Global Investor View)", ["INR (₹)", "USD ($)", "EUR (€)"], horizontal=True)
