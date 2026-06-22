@@ -42,11 +42,11 @@ def execute_pipeline():
     CABIN_COL = 'cabin_class' if 'cabin_class' in df.columns else None
     
     # 2. THE OFFICIAL FINVECTOR 48-COMBINATION MATRIX (Page 2 & 8)
-    routes = ['Mumbai -> Goa', 'Mumbai -> Lakshadweep', 'Mumbai -> High Seas', 
-              'Kochi -> Lakshadweep', 'Chennai -> Vizag -> Puducherry', 'Mumbai -> Western Asia']
+    # FIXED: Replaced long names with raw database keys to prevent the 144 silent data filter crash
+    routes = ['MUM_GOA', 'MUM_LAK', 'MUM_HI_SEAS', 'KCH_LAK', 'CHN_VIZ', 'MUM_WASIA']
     ships = ['EMPRESS', 'SKY'] # Based on Page 2: Cordelia Empress & Cordelia Sky
     cabins = ['INTERIOR', 'SEA_VIEW', 'BALCONY', 'SUITE'] # Official casing from page 4
-    
+
     all_forecasts = []
     success_count = 0
     run_index = 1
