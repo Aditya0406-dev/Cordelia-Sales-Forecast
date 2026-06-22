@@ -198,27 +198,32 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
         st.title("🧮 Route & Cabin Yield Matrix")
         st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
         
-        # Interactive selection row to isolate specific segments across the 48 models
+        # Define Section 1.2 compliant arrays to loop over all 48 models
+        routes = ["MUM-GOA", "MUM-LAK", "MUM-HI-SEAS", "KCH-LAK", "CHN-VIZ", "MUM-WASIA"]
+        ships = ["EMPRESS", "SKY"]
+        cabins = ["BALCONY", "INTERIOR", "SEA_VIEW", "SUITE"]
+
         st.subheader("🔍 Select Target Model Filter Focus")
-        selected_route = st.selectbox("Filter Display Segment by Route Code", ["ALL ROUTES"] + routes)
-        
-        # Create clear data highlights
-        if selected_route != "ALL ROUTES":
-            df_base_fleet["Highlight Status"] = np.where(df_base_fleet["Route Code"] == selected_route, "🎯 Focused Target", "Background Segment")
-            display_df = df_base_fleet.sort_values(by="Highlight Status", ascending=False)
-        else:
-            df_base_fleet["Highlight Status"] = "Global Fleet Context"
-            display_df = df_base_fleet
+        selected_route = st.selectbox("Filter Display Segment by Route Code", ["ALL FLEET COMBINATIONS"] + routes)
+
+        # Route isolation filtering structure
+    if selected_route != "ALL FLEET COMBINATIONS":
+        df_base_fleet["Highlight Status"] = np.where(df_base_fleet["Route Code"] == selected_route, "🎯 Focused Target", "Background Segment")
+        display_df = df_base_fleet[df_base_fleet["Route Code"] == selected_route].copy()
+    else:
+        df_base_fleet["Highlight Status"] = "Global Fleet Context"
+        display_df = df_base_fleet.copy()
+
             
-        # Apply currency metrics dynamically
-        display_df["Base Revenue"] = display_df["Base Revenue"] * rate_multiplier
-        display_df["Simulated Revenue"] = display_df["Simulated Revenue"] * rate_multiplier
-        display_df["Calculated RevPAX"] = display_df["Calculated RevPAX"] * rate_multiplier
+    # Apply currency metrics dynamically
+    display_df["Base Revenue"] = display_df["Base Revenue"] * rate_multiplier
+    display_df["Simulated Revenue"] = display_df["Simulated Revenue"] * rate_multiplier
+    display_df["Calculated RevPAX"] = display_df["Calculated RevPAX"] * rate_multiplier
         
-        st.dataframe(
-            display_df.drop(columns=["Raw Rate"]),
-            use_container_width=True
-        )
+    st.dataframe(
+        display_df.drop(columns=["Raw Rate"]),
+        use_container_width=True
+    )
 
 # ==============================================================================
 # AUDIT-COMPLIANT WORKSPACES: (PAGES 3 & 4)
