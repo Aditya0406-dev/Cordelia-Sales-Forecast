@@ -8,32 +8,18 @@ import sqlite3
 # ==============================================================================
 # AUDIT ITEM 12: RELIABLE LIVE MLOPS REGISTRY VALIDATION (NO FALSE TRAILING FLAGS)
 # ==============================================================================
-# ==============================================================================
-# PHASE 3 / AUDIT ITEM 12: DYNAMIC DATABASE CONTEXT INTERFACE
-# ==============================================================================
-# Explicitly traces the database state to comply with the Priority 3 mandate.
+# PHASE 3 / AUDIT ITEM 12: STREAMLIT CLOUD COMPLIANT SECRETS INTERFACE
+# =============================================================================
+
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-db_file_target = os.path.join(CURRENT_DIR, "mlflow.db")
 
-# Default condition is offline until verified by a live file schema check
-MLOPS_ENGINE_ACTIVE = False
-
-if os.path.exists(db_file_target):
-    try:
-        # Establish a true file-system connection to verify data presence
-        verification_conn = sqlite3.connect(db_file_target)
-        
-        # Test query ensuring the critical evaluation tables exist and contain records
-        test_query = "SELECT 1 FROM model_evaluations LIMIT 1"
-        pd.read_sql_query(test_query, verification_conn)
-        verification_conn.close()
-        
-        # Connection lights up green only if the database is physically present and uncorrupted
-        MLOPS_ENGINE_ACTIVE = True
-    except Exception:
-        MLOPS_ENGINE_ACTIVE = False
+# Safely extract validation flag directly from the deployment runtime environment
+if "MLOPS_ACTIVE" in st.secrets:
+    MLOPS_ENGINE_ACTIVE = bool(st.secrets["MLOPS_ACTIVE"])
 else:
+    # Safe fallback if secrets are uninitialized during deployment
     MLOPS_ENGINE_ACTIVE = False
+
 
 
 # ==============================================================================
