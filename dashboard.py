@@ -14,7 +14,7 @@ try:
     mlflow.set_tracking_uri("sqlite:///mlflow.db")
     MLOPS_ENGINE_ACTIVE = True
 except Exception:
-    MLOPS_ENGINE_ACTIVE = True
+    MLOPS_ENGINE_ACTIVE = False
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 FORECAST_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
