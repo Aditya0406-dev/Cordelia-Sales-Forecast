@@ -215,15 +215,15 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             display_df = df_base_fleet.copy()
 
             
-    # Apply currency metrics dynamically
-    display_df["Base Revenue"] = display_df["Base Revenue"] * rate_multiplier
-    display_df["Simulated Revenue"] = display_df["Simulated Revenue"] * rate_multiplier
-    display_df["Calculated RevPAX"] = display_df["Calculated RevPAX"] * rate_multiplier
+        # Apply currency metrics dynamically
+        display_df["Base Revenue"] = display_df["Base Revenue"] * rate_multiplier
+        display_df["Simulated Revenue"] = display_df["Simulated Revenue"] * rate_multiplier
+        display_df["Calculated RevPAX"] = display_df["Calculated RevPAX"] * rate_multiplier
         
-    st.dataframe(
-        display_df.drop(columns=["Raw Rate"]),
-        use_container_width=True
-    )
+        st.dataframe(
+            display_df.drop(columns=["Raw Rate"]),
+            use_container_width=True
+        )
 
 # ==============================================================================
 # AUDIT-COMPLIANT WORKSPACES: (PAGES 3 & 4)
