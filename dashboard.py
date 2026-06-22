@@ -192,7 +192,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
         )
 
     # --------------------------------------------------------------------------
-    # PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW
+    # PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW WITH COMPLIANT ROUTE KPI CARDS
     # --------------------------------------------------------------------------
     elif page == "2. Route & Cabin Yield Matrix":
         st.title("🧮 Route & Cabin Yield Matrix")
@@ -206,24 +206,61 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
         st.subheader("🔍 Select Target Model Filter Focus")
         selected_route = st.selectbox("Filter Display Segment by Route Code", ["ALL FLEET COMBINATIONS"] + routes)
 
-    # Route isolation filtering structure
-        if selected_route != "ALL FLEET COMBINATIONS":
-            df_base_fleet["Highlight Status"] = np.where(df_base_fleet["Route Code"] == selected_route, "🎯 Focused Target", "Background Segment")
-            display_df = df_base_fleet[df_base_fleet["Route Code"] == selected_route].copy()
-        else:
-            df_base_fleet["Highlight Status"] = "Global Fleet Context"
-            display_df = df_base_fleet.copy()
-
-            
-        # Apply currency metrics dynamically
+        # Build the dynamic copy dataframe with currency conversion factored in
+        display_df = df_base_fleet.copy()
         display_df["Base Revenue"] = display_df["Base Revenue"] * rate_multiplier
         display_df["Simulated Revenue"] = display_df["Simulated Revenue"] * rate_multiplier
         display_df["Calculated RevPAX"] = display_df["Calculated RevPAX"] * rate_multiplier
-        
-        st.dataframe(
-            display_df.drop(columns=["Raw Rate"]),
-            use_container_width=True
-        )
+
+        # Route isolation filtering structure
+        if selected_route != "ALL FLEET COMBINATIONS":
+            display_df["Highlight Status"] = np.where(display_df["Route Code"] == selected_route, "🎯 Focused Target", "Background Segment")
+            filtered_df = display_df[display_df["Route Code"] == selected_route].copy()
+            
+            # ==============================================================================
+            # ROUTE SPECIFIC DYNAMIC KPI CARDS (RESTORED SIMULATION LOGIC)
+            # ==============================================================================
+            st.markdown(f"#### 📊 Performance Summary Matrix for Route Segment: **{selected_route}**")
+            
+            # Aggregate sums matching strictly the selected route's 8 active model combinations
+            route_sim_pax = int(filtered_df["Simulated Booking"].sum())
+            route_sim_revenue = filtered_df["Simulated Revenue"].sum()
+            
+            route_base_pax = filtered_df["Base Booking"].sum()
+            route_pax_delta = route_sim_pax - route_base_pax
+            route_delta_str = f"{route_pax_delta:+,} seats shift" if route_pax_delta != 0 else "Baseline Stable"
+            
+            # Display responsive segment metric cards on top of the grid
+            col_kpi1, col_kpi2 = st.columns(2)
+            with col_kpi1:
+                st.metric(
+                    label=f"{selected_route} BOOKING FORECAST (90 DAYS)", 
+                    value=f"{route_sim_pax:,} PAX", 
+                    delta=route_delta_str,
+                    delta_color="normal" if route_pax_delta >= 0 else "inverse"
+                )
+            with col_kpi2:
+                st.metric(
+                    label=f"{selected_route} PROJECTED GROSS TICKET YIELD", 
+                    value=f"{symbol}{route_sim_revenue:,.2f}",
+                    delta=f"Active Currency Mode: {currency}"
+                )
+            
+            st.markdown("---")
+            # Render the filtered 8-model submatrix view grid
+            st.dataframe(
+                filtered_df.drop(columns=["Raw Rate"]),
+                use_container_width=True,
+                hide_index=True
+            )
+        else:
+            display_df["Highlight Status"] = "Global Fleet Context"
+            st.markdown("#### 🌐 Complete 48-Model Enterprise Yield Ledger")
+            st.dataframe(
+                display_df.drop(columns=["Raw Rate"]),
+                use_container_width=True,
+                hide_index=True
+            )
 
 # ==============================================================================
 # AUDIT-COMPLIANT WORKSPACES: (PAGES 3 & 4)
