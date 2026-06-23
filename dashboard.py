@@ -211,12 +211,12 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
     # PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW WITH COMPLIANT ROUTE KPI CARDS
     # --------------------------------------------------------------------------
 
-    elif page == "2. Route & Cabin Yield Matrix":
+        elif page == "2. Route & Cabin Yield Matrix":
         st.title("🧮 Route & Cabin Yield Matrix")
         st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
         
-        # Priority 2, Item 5 Compliant: Aligned with the database keys to match models correctly
-        routes = ['MUM_GOA', 'MUM_LAK', 'MUM_HI_SEAS', 'KCH_LAK', 'CHN_VIZ', 'MUM_WASIA']
+        # Aligned precisely with your database raw hyphen keys
+        routes = ['MUM-GOA', 'MUM-LAK', 'MUM-HS', 'KCH-LAK', 'CHN-VIZ-PUD', 'MUM-WA']
         ships = ["EMPRESS", "SKY"]
         cabins = ["INTERIOR", "SEA_VIEW", "BALCONY", "SUITE"]
 
@@ -226,7 +226,10 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
         # Build clean workspace data copies
         display_df = df_base_fleet.copy()
         
-        # Assign explicit string columns directly to prevent any list indexing issues
+        # Explicitly strip column names to clear any accidental white spaces
+        display_df.columns = [str(c).strip() for c in display_df.columns]
+        
+        # Fixed explicit string paths to prevent indexing failures
         route_col = "Route Code"
         ship_col = "Ship Name"
         cabin_col = "Cabin Class"
@@ -243,8 +246,8 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             
             st.markdown(f"#### 📊 Performance Summary Matrix for Route Segment: **{selected_route}**")
             
-            # Read real values from database pipeline records directly (No modifications or multipliers)
-            route_sim_pax = int(filtered_df["Simulated Booking"].sum())
+            # Read real values from database pipeline records directly
+            route_sim_pax = int(filtered_df[booking_col].sum())
             route_sim_revenue = filtered_df["Simulated Revenue"].sum()
             route_base_pax = filtered_df["Base Booking"].sum()
             
@@ -267,7 +270,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 )
             
             # ==============================================================================
-            # REAL 4x2 MATRIX SUMMARY GRID (Priority 3, Item 10 Fixed)
+            # REAL 4x2 MATRIX SUMMARY GRID
             # ==============================================================================
             st.markdown("---")
             st.subheader(f"📊 Cabin Yield Matrix Summary Grid ({selected_route})")
@@ -276,7 +279,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             for cabin in cabins:
                 row_dict = {"Cabin Class": cabin.replace("_", " ")}
                 for ship in ships:
-                    # Case-insensitive validation to verify clean, non-truncated category labels
+                    # String-based exact matching matrix filtering
                     cell_match = filtered_df[
                         (filtered_df[cabin_col].astype(str).str.upper().str.strip() == cabin) & 
                         (filtered_df[ship_col].astype(str).str.upper().str.strip() == ship)
@@ -291,7 +294,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             st.dataframe(pd.DataFrame(matrix_rows), use_container_width=True, hide_index=True)
 
             # ==============================================================================
-            # REAL TIME-SERIES PIPELINE HOOKS (Priority 1, Item 1 & Priority 3, Item 9/13 Fixed)
+            # REAL TIME-SERIES PIPELINE HOOKS
             # ==============================================================================
             st.markdown("---")
             st.subheader(f"📈 90-Day Predictive Voyage Timeline Detail")
@@ -303,6 +306,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 active_cabin = st.selectbox("Select Timeline Cabin Context:", cabins, key="matrix_cabin_select")
             
             if 'df_forecast' in locals():
+                # Re-align model_key trace string search with real hyphens to map results.csv correctly
                 target_key = f"{selected_route}_{active_ship}_{active_cabin}"
                 df_chart = df_forecast[df_forecast['model_key'] == target_key].sort_values('sailing_date')
                 
@@ -310,18 +314,15 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                     import plotly.graph_objects as go
                     fig = go.Figure()
                     
-                    # High-fidelity confidence upper border envelope trace
                     fig.add_trace(go.Scatter(
                         x=df_chart['sailing_date'], y=df_chart['forecast_upper'],
                         mode='lines', line=dict(width=0), showlegend=False
                     ))
-                    # Translucent branded shading using official FinVector Purple (#64189E) at 15% opacity
                     fig.add_trace(go.Scatter(
                         x=df_chart['sailing_date'], y=df_chart['forecast_lower'],
                         mode='lines', line=dict(width=0), fill='tonexty',
                         fillcolor='rgba(100, 24, 158, 0.15)', name='95% Confidence Interval'
                     ))
-                    # Real forecasted output trend line (Completely removed old x1000 data fabrication script)
                     fig.add_trace(go.Scatter(
                         x=df_chart['sailing_date'], y=df_chart['forecasted_bookings'],
                         mode='lines', line=dict(color='#64189E', width=3), name='Forecasted Bookings'
