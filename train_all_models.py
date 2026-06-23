@@ -7,16 +7,9 @@ import mlflow.data
 from datetime import datetime
 
 # --- LOCAL FILE PATH CONFIGURATION ---
-# This looks for the files exactly where the script runs from, preventing folder jumping errors
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# If final_engineered_features.csv is in the SAME folder as this script:
 CSV_PATH = os.path.join(CURRENT_DIR, "features", "final_engineered_features.csv")
-
-
-# This saves forecast_results.csv in the SAME folder as this script:
 OUTPUT_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
-
 MLFLOW_TRACKING_URI = "http://127.0.0.1:5001"
 
 def execute_pipeline():
@@ -28,7 +21,7 @@ def execute_pipeline():
     df = pd.read_csv(CSV_PATH)
     df.columns = [col.strip() for col in df.columns]
     
-    # 1. SCHEMA DEFINITION MATCHING FINVECTOR SPECIFICATION (Page 4-5)
+    # 1. SCHEMA DEFINITION
     ROUTE_COL = 'route_code'
     DS_COL = 'sailing_date'
     TARGET_COL = 'passengers_count' if 'passengers_count' in df.columns else df.columns[-1]
@@ -42,11 +35,13 @@ def execute_pipeline():
     SHIP_COL = 'clean_ship_id'
     CABIN_COL = 'cabin_class' if 'cabin_class' in df.columns else None
     
-    # 2. THE OFFICIAL FINVECTOR 48-COMBINATION MATRIX (Page 2 & 8)
-    # FIXED: Replaced long names with raw database keys to prevent the 144 silent data filter crash
+    # Ensure correct datetime parsing for lookups
+    df[DS_COL] = pd.to_datetime(df[DS_COL])
+    
+    # 2. THE OFFICIAL FINVECTOR 48-COMBINATION MATRIX
     routes = ['MUM_GOA', 'MUM_LAK', 'MUM_HI_SEAS', 'KCH_LAK', 'CHN_VIZ', 'MUM_WASIA']
-    ships = ['EMPRESS', 'SKY'] # Based on Page 2: Cordelia Empress & Cordelia Sky
-    cabins = ['INTERIOR', 'SEA_VIEW', 'BALCONY', 'SUITE'] # Official casing from page 4
+    ships = ['EMPRESS', 'SKY'] 
+    cabins = ['INTERIOR', 'SEA_VIEW', 'BALCONY', 'SUITE'] 
 
     all_forecasts = []
     success_count = 0
@@ -63,48 +58,50 @@ def execute_pipeline():
     for r in routes:
         for s in ships:
             for c in cabins:
-                # Standardized underscore delimiter token used in your dashboard filters
                 model_key = f"{r}_{s}_{c}"
                 
                 if CABIN_COL:
-                    df_filtered = df[(df[ROUTE_COL].str.strip() == r) & (df[SHIP_COL].str.strip() == s) & (df[CABIN_COL].str.strip() == c)]
+                    df_filtered = df[(df[ROUTE_COL].str.strip() == r) & (df[SHIP_COL].str.strip() == s) & (df[CABIN_COL].str.strip() == c)].copy()
                 else:
-                    df_filtered = df[(df[ROUTE_COL].str.strip() == r) & (df[SHIP_COL].str.strip() == s)]
+                    df_filtered = df[(df[ROUTE_COL].str.strip() == r) & (df[SHIP_COL].str.strip() == s)].copy()
                 
                 try:
                     df_prophet = pd.DataFrame()
                     if len(df_filtered) >= 30:
-                        df_prophet['ds'] = pd.to_datetime(df_filtered[DS_COL])
+                        df_prophet['ds'] = df_filtered[DS_COL]
                         df_prophet['y'] = pd.to_numeric(df_filtered[TARGET_COL])
+                        
+                        # Set up regressors mapping directly from your master engineered feature file
+                        regressors = ['is_weekend', 'is_indian_public_holiday', 'school_holiday_flag', 'is_monsoon']
+                        for reg in regressors:
+                            if reg in df_filtered.columns:
+                                df_prophet[reg] = df_filtered[reg]
+                        
                         df_prophet = df_prophet.groupby('ds', as_index=False).mean()
                         df_prophet = df_prophet.replace([np.inf, -np.inf], np.nan).dropna(subset=['y'])
 
-                    # FIXED (Item 7): Log row count per model segment
                     segment_row_count = len(df_prophet)
                     print(f"[METRIC] Route Segment: {model_key} | Total Historical Rows: {segment_row_count}")
 
-                    # FIXED (Item 6 & 7): Fail if data has less than 30 points. No fake fallback values or 1.28% MAPE.
                     if segment_row_count < 30:
-                        raise ValueError(f"CRITICAL ERROR: Segment model {model_key} has less than 30 data points ({segment_row_count} found). Training stopped.")
+                        raise ValueError(f"CRITICAL ERROR: Segment model {model_key} has less than 30 data points. Training stopped.")
 
-                    # --- NATIVE PROPHET ENGINE WITH CRUISE BUSINESS MATH (Page 8) ---
+                    # --- NATIVE PROPHET ENGINE ---
                     model = Prophet(
-                        seasonality_mode='multiplicative', # Proportional scaling optimization
-                        yearly_seasonality=False,          # Overwritten by custom Fourier series
-                        changepoint_prior_scale=0.05
+                        seasonality_mode='multiplicative', 
+                        yearly_seasonality=False,          
+                        changepoint_prior_scale=0.05,
+                        interval_width=0.95 # Explicitly sets 95% Confidence Intervals for your chart
                     )
                     
-                    # Fine-detailed fourier orders matching Appendix demand shifts
                     model.add_seasonality(name='yearly_custom', period=365.25, fourier_order=10)
                     model.add_seasonality(name='indian_summer_holiday', period=365.25, fourier_order=3)
                     
-                    regressors = ['is_weekend', 'is_indian_public_holiday', 'school_holiday_flag', 'is_monsoon']
+                    active_regressors = []
                     for reg in regressors:
-                        if reg in df_filtered.columns:
-                            feature_map = df_filtered.set_index(pd.to_datetime(df_filtered[DS_COL]))[reg].to_dict()
-                            df_prophet[reg] = df_prophet['ds'].map(feature_map).fillna(0)
-                            if df_prophet[reg].nunique() > 1:
-                                model.add_regressor(reg)
+                        if reg in df_prophet.columns and df_prophet[reg].nunique() > 1:
+                            model.add_regressor(reg)
+                            active_regressors.append(reg)
                             
                     model.fit(df_prophet)
                     
@@ -122,14 +119,21 @@ def execute_pipeline():
                     except Exception:
                         pass
 
+                    # --- FIXED FUTURE REGRESSOR ENGINE ---
+                    # Create baseline future dataframe
                     future_df = model.make_future_dataframe(periods=90, freq='D')
-                    for reg in regressors:
-                        if reg in df_prophet.columns:
-                            future_df[reg] = df_prophet[reg].mean()
-                            
-                    forecast_future = model.predict(future_df).tail(90)
                     
-                    for _, row in forecast_future.iterrows():
+                    # Create a master lookup from your original df to map REAL future dates to your holiday flags
+                    for reg in active_regressors:
+                        # Fallback map to assign values if calendar entries exist in the feature file
+                        feature_map = df.set_index(DS_COL)[reg].to_dict()
+                        future_df[reg] = future_df['ds'].map(feature_map).fillna(0)
+                            
+                    # Generate predictions for BOTH historical and future frames to keep data unbroken
+                    forecast_full = model.predict(future_df)
+                    
+                    # Append all rows (historical + future) so your Streamlit timeline has zero empty slots
+                    for _, row in forecast_full.iterrows():
                         all_forecasts.append({
                             "model_key": model_key,
                             "sailing_date": row['ds'].strftime('%Y-%m-%d'),
@@ -147,7 +151,6 @@ def execute_pipeline():
                 
                 run_index += 1
 
-    # Verify and create features directory if missing
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     
     if all_forecasts:
