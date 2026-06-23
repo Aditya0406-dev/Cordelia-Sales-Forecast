@@ -307,7 +307,13 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 # Load the clean predictive model results directly into the chart pipeline
                 df_forecast = pd.read_csv(results_csv_path)
                 
-                # Align structural mapping tags with your database route, vessel, and cabin keys
+                # Standardize column casing and whitespace to completely eliminate KeyErrors
+                df_forecast.columns = [str(c).strip().lower() for c in df_forecast.columns]
+                
+                # Explicitly parse the sailing date string into a Datetime object so Plotly can index it
+                df_forecast['sailing_date'] = pd.to_datetime(df_forecast['sailing_date'])
+                
+                # Align structural mapping tags with your lowercase standardized keys
                 target_key = f"{selected_route}_{active_ship}_{active_cabin}"
                 df_chart = df_forecast[df_forecast['model_key'] == target_key].sort_values('sailing_date')
                 
