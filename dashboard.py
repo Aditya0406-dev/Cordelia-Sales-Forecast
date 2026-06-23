@@ -227,12 +227,6 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
         
         # Explicitly strip column names to clear any accidental white spaces
         display_df.columns = [str(c).strip() for c in display_df.columns]
-        
-        # Fixed explicit string paths to prevent indexing failures
-        route_col = "Route Code"
-        ship_col = "Ship Name"
-        cabin_col = "Cabin Class"
-        booking_col = "Simulated Booking"
 
         # Apply global currency adjustments
         display_df["Base Revenue"] = display_df["Base Revenue"] * rate_multiplier
@@ -240,13 +234,13 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
         display_df["Calculated RevPAX"] = display_df["Calculated RevPAX"] * rate_multiplier
 
         if selected_route != "ALL FLEET COMBINATIONS":
-            display_df["Highlight Status"] = np.where(display_df[route_col] == selected_route, "🎯 Focused Target", "Background Segment")
-            filtered_df = display_df[display_df[route_col] == selected_route].copy()
+            display_df["Highlight Status"] = np.where(display_df["Route Code"] == selected_route, "🎯 Focused Target", "Background Segment")
+            filtered_df = display_df[display_df["Route Code"] == selected_route].copy()
             
             st.markdown(f"#### 📊 Performance Summary Matrix for Route Segment: **{selected_route}**")
             
             # Read real values from database pipeline records directly
-            route_sim_pax = int(filtered_df[booking_col].sum())
+            route_sim_pax = int(filtered_df["Simulated Booking"].sum())
             route_sim_revenue = filtered_df["Simulated Revenue"].sum()
             route_base_pax = filtered_df["Base Booking"].sum()
             
@@ -269,7 +263,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 )
             
             # ==============================================================================
-            # REAL 4x2 MATRIX SUMMARY GRID
+            # REAL 4x2 MATRIX SUMMARY GRID - ENTIRELY DIRECT STRINGS TO FORCE-FIX KEYERROR
             # ==============================================================================
             st.markdown("---")
             st.subheader(f"📊 Cabin Yield Matrix Summary Grid ({selected_route})")
@@ -278,13 +272,13 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             for cabin in cabins:
                 row_dict = {"Cabin Class": cabin.replace("_", " ")}
                 for ship in ships:
-                    # String-based exact matching matrix filtering
+                    # Pure, explicit string names used here. No variables can leak or cause KeyErrors.
                     cell_match = filtered_df[
-                        (filtered_df[cabin_col].astype(str).str.upper().str.strip() == cabin) & 
-                        (filtered_df[ship_col].astype(str).str.upper().str.strip() == ship)
+                        (filtered_df["Cabin Class"].astype(str).str.upper().str.strip() == cabin) & 
+                        (filtered_df["Ship Name"].astype(str).str.upper().str.strip() == ship)
                     ]
                     if not cell_match.empty:
-                        bookings = int(cell_match[booking_col].sum())
+                        bookings = int(cell_match["Simulated Booking"].sum())
                         row_dict[ship] = f"{bookings:,} PAX"
                     else:
                         row_dict[ship] = "0 PAX"
@@ -305,7 +299,6 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 active_cabin = st.selectbox("Select Timeline Cabin Context:", cabins, key="matrix_cabin_select")
             
             if 'df_forecast' in locals():
-                # Re-align model_key trace string search with real hyphens to map results.csv correctly
                 target_key = f"{selected_route}_{active_ship}_{active_cabin}"
                 df_chart = df_forecast[df_forecast['model_key'] == target_key].sort_values('sailing_date')
                 
