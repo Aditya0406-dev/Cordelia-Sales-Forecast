@@ -21,7 +21,7 @@ def execute_pipeline():
     df = pd.read_csv(CSV_PATH)
     df.columns = [col.strip() for col in df.columns]
     
-    # 1. SCHEMA DEFINITION
+    # 1. SCHEMA DEFINITION & INGESTION SANITIZATION (REPORT COMPLIANT)
     ROUTE_COL = 'route_code'
     DS_COL = 'sailing_date'
     TARGET_COL = 'passengers_count' if 'passengers_count' in df.columns else df.columns[-1]
@@ -35,13 +35,19 @@ def execute_pipeline():
     SHIP_COL = 'clean_ship_id'
     CABIN_COL = 'cabin_class' if 'cabin_class' in df.columns else None
     
+    # Clean the source dataframe values immediately upon ingestion.
+    df[ROUTE_COL] = df[ROUTE_COL].astype(str).str.strip()
+    df[SHIP_COL] = df[SHIP_COL].astype(str).str.strip()
+    if CABIN_COL:
+        df[CABIN_COL] = df[CABIN_COL].astype(str).str.strip()
+    
     # Ensure correct datetime parsing for lookups
     df[DS_COL] = pd.to_datetime(df[DS_COL])
     
-    # 2. THE OFFICIAL FINVECTOR 48-COMBINATION MATRIX
+    # 2. THE OFFICIAL FINVECTOR 48-COMBINATION MATRIX (REPORT COMPLIANT SCHEMA keys)
     routes = ['MUM-GOA', 'MUM-LAK', 'MUM-HS', 'KCH-LAK', 'CHN-VIZ-PUD', 'MUM-WA']
     ships = ['EMPRESS', 'SKY'] 
-    cabins = ['Interior', 'Sea View', 'Balcony', 'Suite'] 
+    cabins = ['INTERIOR', 'SEA_VIEW', 'BALCONY', 'SUITE'] 
 
     all_forecasts = []
     success_count = 0
@@ -60,19 +66,18 @@ def execute_pipeline():
             for c in cabins:
                 model_key = f"{r}_{s}_{c}"
                 
+                # REPORT COMPLIANT FILTER: Pure, explicit matching against the cleaned schema.
                 if CABIN_COL:
-                    df_filtered = df[(df[ROUTE_COL].str.strip() == r) & (df[SHIP_COL].str.strip() == s) & (df[CABIN_COL].str.strip() == c)].copy()
+                    df_filtered = df[(df[ROUTE_COL] == r) & (df[SHIP_COL] == s) & (df[CABIN_COL] == c)].copy()
                 else:
-                    df_filtered = df[(df[ROUTE_COL].str.strip() == r) & (df[SHIP_COL].str.strip() == s)].copy()
+                    df_filtered = df[(df[ROUTE_COL] == r) & (df[SHIP_COL] == s)].copy()
 
-                
                 try:
                     df_prophet = pd.DataFrame()
                     if len(df_filtered) >= 30:
                         df_prophet['ds'] = df_filtered[DS_COL]
                         df_prophet['y'] = pd.to_numeric(df_filtered[TARGET_COL])
                         
-                        # Set up regressors mapping directly from your master engineered feature file
                         regressors = ['is_weekend', 'is_indian_public_holiday', 'school_holiday_flag', 'is_monsoon']
                         for reg in regressors:
                             if reg in df_filtered.columns:
@@ -84,8 +89,9 @@ def execute_pipeline():
                     segment_row_count = len(df_prophet)
                     print(f"[METRIC] Route Segment: {model_key} | Total Historical Rows: {segment_row_count}")
 
+                    # REPORT COMPLIANT (Priority 2, Item 7): Fail loudly if rows are missing instead of bailing out to fixed constants.
                     if segment_row_count < 30:
-                        raise ValueError(f"CRITICAL ERROR: Segment model {model_key} has less than 30 data points. Training stopped.")
+                        raise ValueError(f"CRITICAL COMPLIANCE FAILURE: Model segment {model_key} contains only {segment_row_count} real historical data points. Minimum required is 30.")
 
                     # --- NATIVE PROPHET ENGINE ---
                     model = Prophet(
@@ -121,19 +127,15 @@ def execute_pipeline():
                         pass
 
                     # --- FIXED FUTURE REGRESSOR ENGINE ---
-                    # Create baseline future dataframe
                     future_df = model.make_future_dataframe(periods=90, freq='D')
                     
-                    # Create a master lookup from your original df to map REAL future dates to your holiday flags
                     for reg in active_regressors:
-                        # Fallback map to assign values if calendar entries exist in the feature file
                         feature_map = df.set_index(DS_COL)[reg].to_dict()
                         future_df[reg] = future_df['ds'].map(feature_map).fillna(0)
                             
-                    # Generate predictions for BOTH historical and future frames to keep data unbroken
                     forecast_full = model.predict(future_df)
                     
-                    # Append all rows (historical + future) so your Streamlit timeline has zero empty slots
+                    # REPORT COMPLIANT (Priority 2 Item 8 & Priority 3 Item 9): Output rounded integer whole passenger counts directly.
                     for _, row in forecast_full.iterrows():
                         all_forecasts.append({
                             "model_key": model_key,
