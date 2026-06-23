@@ -61,9 +61,17 @@ def execute_pipeline():
                 model_key = f"{r}_{s}_{c}"
                 
                 if CABIN_COL:
-                    df_filtered = df[(df[ROUTE_COL].str.strip() == r) & (df[SHIP_COL].str.strip() == s) & (df[CABIN_COL].str.strip() == c)].copy()
+                    df_filtered = df[
+                        (df[ROUTE_COL].astype(str).str.strip().str.upper() == str(r).upper()) & 
+                        (df[SHIP_COL].astype(str).str.strip().str.upper() == str(s).upper()) & 
+                        (df[CABIN_COL].astype(str).str.strip().str.upper() == str(c).upper())
+                    ].copy()
                 else:
-                    df_filtered = df[(df[ROUTE_COL].str.strip() == r) & (df[SHIP_COL].str.strip() == s)].copy()
+                    df_filtered = df[
+                        (df[ROUTE_COL].astype(str).str.strip().str.upper() == str(r).upper()) & 
+                        (df[SHIP_COL].astype(str).str.strip().str.upper() == str(s).upper())
+                    ].copy()
+
                 
                 try:
                     df_prophet = pd.DataFrame()
