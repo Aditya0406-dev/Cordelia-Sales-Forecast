@@ -327,9 +327,9 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 # Get the true backend key string from the map
                 backend_route = route_key_map.get(selected_route, selected_route)
                 
-                # Build target string filter using aligned keys
-                target_key = f"{backend_route}_{active_ship}_{active_cabin}".strip().lower()
-                df_chart = df_forecast[df_forecast['model_key'] == target_key].sort_values('sailing_date')
+                # Build target string filter using aligned keys (FORCED UPPERCASE MATCHING TO FIX THE BLANK GRAPH)
+                target_key = f"{backend_route}_{active_ship}_{active_cabin}".strip().upper()
+                df_chart = df_forecast[df_forecast['model_key'].astype(str).str.upper() == target_key].sort_values('sailing_date')
                 
                 if not df_chart.empty:
                     import plotly.graph_objects as go
@@ -359,8 +359,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                     fig.add_trace(go.Scatter(
                         x=df_chart['sailing_date'], 
                         y=df_chart['forecasted_bookings'],
-                        mode='lines', 
-                        line=dict(color='#64189E', width=3), 
+                        mode='lines', line=dict(color='#64189E', width=3), 
                         name='Expected Bookings Trend'
                     ))
                     
@@ -379,6 +378,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                     st.info(f"Awaiting real Prophet timeline entries for model segment: {target_key}")
             else:
                 st.warning("Master forecast_results.csv output file not found in repository root. Please run train_all_models.py.")
+
 
             st.markdown("---")
             st.markdown("#### 📑 Granular Segment Ledger View")
