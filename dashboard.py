@@ -335,33 +335,45 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 df_chart = df_forecast[df_forecast['model_key'].astype(str).str.upper() == target_key].sort_values('sailing_date')
 
                 if not df_chart.empty:
+                    # DYNAMIC SCHEMA MAP: Auto-detect column headers to prevent KeyErrors
+                    cols = list(df_chart.columns)
+                    
+                    # Target upper band column detection
+                    upper_col = 'forecast_upper' if 'forecast_upper' in cols else ('yhat_upper' if 'yhat_upper' in cols else None)
+                    # Target lower band column detection
+                    lower_col = 'forecast_lower' if 'forecast_lower' in cols else ('yhat_lower' if 'yhat_lower' in cols else None)
+                    # Target point forecast column detection
+                    forecast_col = 'forecasted_bookings' if 'forecasted_bookings' in cols else ('yhat' if 'yhat' in cols else cols[1])
+
                     import plotly.graph_objects as go
                     fig = go.Figure()
                     
                     # 1. High-fidelity confidence upper border envelope trace (Item 13 Compliant)
-                    fig.add_trace(go.Scatter(
-                        x=df_chart['sailing_date'], 
-                        y=df_chart['forecast_upper'],
-                        mode='lines', 
-                        line=dict(width=0), 
-                        showlegend=False
-                    ))
+                    if upper_col:
+                        fig.add_trace(go.Scatter(
+                            x=df_chart['sailing_date'], 
+                            y=df_chart[upper_col],
+                            mode='lines', 
+                            line=dict(width=0), 
+                            showlegend=False
+                        ))
                     
                     # 2. Translucent branded shading using official FinVector Purple (#64189E) at 15% opacity (Item 14 Compliant)
-                    fig.add_trace(go.Scatter(
-                        x=df_chart['sailing_date'], 
-                        y=df_chart['forecast_lower'],
-                        mode='lines', 
-                        line=dict(width=0), 
-                        fill='tonexty',
-                        fillcolor='rgba(100, 24, 158, 0.15)', 
-                        name='95% Confidence Interval'
-                    ))
+                    if lower_col and upper_col:
+                        fig.add_trace(go.Scatter(
+                            x=df_chart['sailing_date'], 
+                            y=df_chart[lower_col],
+                            mode='lines', 
+                            line=dict(width=0), 
+                            fill='tonexty',
+                            fillcolor='rgba(100, 24, 158, 0.15)', 
+                            name='95% Confidence Interval'
+                        ))
                     
                     # 3. Real point forecast trend line (Item 9 Compliant: Completely removed the x1000 hack)
                     fig.add_trace(go.Scatter(
                         x=df_chart['sailing_date'], 
-                        y=df_chart['forecasted_bookings'],
+                        y=df_chart[forecast_col],
                         mode='lines+markers', 
                         line=dict(color='#64189E', width=3), 
                         name='Expected Bookings Trend'
@@ -382,7 +394,6 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                     st.plotly_chart(fig, use_container_width=True)
                 else:
                     st.info(f"Awaiting real Prophet timeline entries for model segment: {target_key}")
-
 
             st.markdown("---")
             st.markdown("#### 📑 Granular Segment Ledger View")
