@@ -217,7 +217,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
         st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
         
         # 1. FIXED STRINGS TO MATCH DATABASE SPECIFICATIONS (NO CRASH FILTER ALIGNMENT)
-        routes = ['MUM-GOA', 'MUM-LAK', 'MUM-HS, 'KCH-LAK', 'CHN-VIZ-PUD', 'MUM-WA']
+        routes = ['MUM-GOA', 'MUM-LAK', 'MUM-HS', 'KCH-LAK', 'CHN-VIZ-PUD', 'MUM-WA']
         ships = ["EMPRESS", "SKY"]
         cabins = ["INTERIOR", "SEA_VIEW", "BALCONY", "SUITE"]
 
