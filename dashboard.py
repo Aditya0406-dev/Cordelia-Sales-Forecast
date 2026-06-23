@@ -92,7 +92,7 @@ page = st.sidebar.radio(
 # DATA ENGINE: GENERATE ACCURATE BASELINE MATRIX (ALL 48 COMBINATIONS)
 # ==============================================================================
 # Explicit structural configuration lists derived completely from the guide
-routes = ["MUM-GOA", "MUM-LAK", "MUM-HS", "KOCHI-LAK", "CHN-VIZ-PUD", "MUM-WA"]
+routes = ["MUM-GOA", "MUM-LAK", "MUM-HS", "KCH-LAK", "CHN-VIZ-PUD", "MUM-WA"]
 ships = ["EMPRESS", "SKY"]
 cabins = ["BALCONY", "INTERIOR", "SEA_VIEW", "SUITE"]  # Item 10 Fix: Restored true label strings
 
