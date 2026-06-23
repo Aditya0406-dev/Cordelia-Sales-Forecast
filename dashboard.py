@@ -327,8 +327,10 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 # Get the true backend key string from the map
                 backend_route = route_key_map.get(selected_route, selected_route)
                 
-                # Build target string filter using aligned keys (FORCED UPPERCASE MATCHING TO FIX THE BLANK GRAPH)
-                target_key = f"{backend_route}_{active_ship}_{active_cabin}".strip().upper()
+                # Build target string filter using aligned keys (CLEAN UPPERCASE FOR BOTH VALUE STRINGS)
+                target_key = f"{backend_route}_{active_ship}_{active_cabin}".replace(" ", "_").strip().upper()
+                
+                # Standardize the CSV model_key column to upper case to bypass the 'Interior' vs 'INTERIOR' mismatch
                 df_chart = df_forecast[df_forecast['model_key'].astype(str).str.upper() == target_key].sort_values('sailing_date')
                 
                 if not df_chart.empty:
@@ -378,7 +380,6 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                     st.info(f"Awaiting real Prophet timeline entries for model segment: {target_key}")
             else:
                 st.warning("Master forecast_results.csv output file not found in repository root. Please run train_all_models.py.")
-
 
             st.markdown("---")
             st.markdown("#### 📑 Granular Segment Ledger View")
