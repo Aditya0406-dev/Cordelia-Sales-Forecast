@@ -298,7 +298,16 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             with col_c:
                 active_cabin = st.selectbox("Select Timeline Cabin Context:", cabins, key="matrix_cabin_select")
             
-            if 'df_forecast' in locals():
+            # Priority 3, Item 9 Compliant: Safe local file path connection check
+            import os
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            results_csv_path = os.path.join(current_dir, "forecast_results.csv")
+
+            if os.path.exists(results_csv_path):
+                # Load the clean predictive model results directly into the chart pipeline
+                df_forecast = pd.read_csv(results_csv_path)
+                
+                # Align structural mapping tags with your database route, vessel, and cabin keys
                 target_key = f"{selected_route}_{active_ship}_{active_cabin}"
                 df_chart = df_forecast[df_forecast['model_key'] == target_key].sort_values('sailing_date')
                 
@@ -306,15 +315,18 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                     import plotly.graph_objects as go
                     fig = go.Figure()
                     
+                    # High-fidelity confidence upper border envelope trace
                     fig.add_trace(go.Scatter(
                         x=df_chart['sailing_date'], y=df_chart['forecast_upper'],
                         mode='lines', line=dict(width=0), showlegend=False
                     ))
+                    # Translucent branded shading using official FinVector Purple (#64189E) at 15% opacity
                     fig.add_trace(go.Scatter(
                         x=df_chart['sailing_date'], y=df_chart['forecast_lower'],
                         mode='lines', line=dict(width=0), fill='tonexty',
                         fillcolor='rgba(100, 24, 158, 0.15)', name='95% Confidence Interval'
                     ))
+                    # Real forecasted output trend line from your actual Prophet pipeline execution
                     fig.add_trace(go.Scatter(
                         x=df_chart['sailing_date'], y=df_chart['forecasted_bookings'],
                         mode='lines', line=dict(color='#64189E', width=3), name='Forecasted Bookings'
@@ -331,7 +343,8 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 else:
                     st.info(f"Awaiting real Prophet timeline entries for model segment: {target_key}")
             else:
-                st.warning("Master forecast_results.csv tracker dataframe missing from active memory stack.")
+                st.warning("Master forecast_results.csv output file not found in repository root. Please run train_all_models.py to generate it.")
+
             
             st.markdown("---")
             st.markdown("#### 📑 Granular Segment Ledger View")
