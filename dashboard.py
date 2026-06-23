@@ -299,7 +299,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             with col_c:
                 active_cabin = st.selectbox("Select Timeline Cabin Context:", cabins, key="matrix_cabin_select")
             
-                        # Priority 3, Item 9 Compliant: Safe local file path validation (No hardcoded paths)
+            # Priority 3, Item 9 Compliant: Safe local file path validation
             import os
             current_dir = os.path.dirname(os.path.abspath(__file__))
             results_csv_path = os.path.join(current_dir, "forecast_results.csv")
@@ -314,8 +314,21 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 # Explicitly parse sailing_date into a datetime object for Plotly timeline indexing
                 df_forecast['sailing_date'] = pd.to_datetime(df_forecast['sailing_date'])
                 
-                # Build target string filter using your exact database values
-                target_key = f"{selected_route}_{active_ship}_{active_cabin}".strip().lower()
+                # EXPLICIT AUDIT MAP: Translates frontend dropdown keys to match backend CSV keys exactly
+                route_key_map = {
+                    "MUM-GOA": "MUM_GOA",
+                    "MUM-LAK": "MUM_LAK",
+                    "MUM-HS": "MUM_HI_SEAS",
+                    "KCH-LAK": "KCH_LAK",
+                    "CHN-VIZ-PUD": "CHN_VIZ",
+                    "MUM-WA": "MUM_WASIA"
+                }
+                
+                # Get the true backend key string from the map
+                backend_route = route_key_map.get(selected_route, selected_route)
+                
+                # Build target string filter using aligned keys
+                target_key = f"{backend_route}_{active_ship}_{active_cabin}".strip().lower()
                 df_chart = df_forecast[df_forecast['model_key'] == target_key].sort_values('sailing_date')
                 
                 if not df_chart.empty:
@@ -367,7 +380,6 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             else:
                 st.warning("Master forecast_results.csv output file not found in repository root. Please run train_all_models.py.")
 
-            
             st.markdown("---")
             st.markdown("#### 📑 Granular Segment Ledger View")
             st.dataframe(filtered_df.drop(columns=["Raw Rate"]), use_container_width=True, hide_index=True)
