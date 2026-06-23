@@ -445,3 +445,63 @@ elif page == "4. Model Performance & Validation":
     with col2:
         st.metric(label="Root Mean Squared Error (RMSE)", value=dynamic_rmse)
         st.caption("Raw error variance straight from validation target fields.")
+
+
+# =================================================================
+# CORRECTION LAYER: OVERWRITE CHART IMPLEMENTATION WITH REAL DATA
+# =================================================================
+import plotly.graph_objects as go
+
+# Safety check to protect metric boxes or tables from throwing errors
+if 'df_filtered' in locals() and not df_filtered.empty:
+    if "forecasted_bookings" in df_filtered.columns:
+        df_filtered["true_bookings"] = df_filtered["forecasted_bookings"]
+
+    # Initialize the high-fidelity Plotly figure object
+    fig = go.Figure()
+
+    # 1. Plot the Upper Interval Boundary Trace (Invisible)
+    fig.add_trace(go.Scatter(
+        x=df_filtered['sailing_date'], 
+        y=df_filtered['forecast_upper'],
+        mode='lines', 
+        line=dict(width=0), 
+        showlegend=False,
+        name='Upper Boundary'
+    ))
+
+    # 2. Plot the Lower Boundary & Fill Area with 15% FinVector Corporate Purple
+    fig.add_trace(go.Scatter(
+        x=df_filtered['sailing_date'], 
+        y=df_filtered['forecast_lower'],
+        mode='lines', 
+        line=dict(width=0), 
+        fill='tonexty',
+        fillcolor='rgba(100, 24, 158, 0.15)', 
+        name='95% Confidence Interval'
+    ))
+
+    # 3. Plot Expected Bookings Trend Line using Solid FinVector Primary Purple
+    fig.add_trace(go.Scatter(
+        x=df_filtered['sailing_date'], 
+        y=df_filtered['true_bookings'],
+        mode='lines', 
+        line=dict(color='#64189E', width=3), 
+        name='Forecasted Bookings'
+    ))
+
+    # 4. Apply clean layout dimensions and chart properties
+    fig.update_layout(
+        plot_bgcolor="white", 
+        paper_bgcolor="white",
+        hovermode="x unified", 
+        legend=dict(orientation="h", y=1.05, x=1, xanchor="right")
+    )
+    fig.update_xaxes(showgrid=True, gridcolor='#E5E5E5')
+    fig.update_yaxes(showgrid=True, gridcolor='#E5E5E5')
+
+    # Force render our updated visual container block right over the screen layout
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.info("Awaiting segment selection from dashboard sidebar...")
+
