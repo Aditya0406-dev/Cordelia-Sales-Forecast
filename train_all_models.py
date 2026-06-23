@@ -39,7 +39,7 @@ def execute_pipeline():
     df[DS_COL] = pd.to_datetime(df[DS_COL])
     
     # 2. THE OFFICIAL FINVECTOR 48-COMBINATION MATRIX
-    routes = ['MUM_GOA', 'MUM_LAK', 'MUM_HI_SEAS', 'KCH_LAK', 'CHN_VIZ', 'MUM_WASIA']
+    routes = ['MUM_GOA', 'MUM_LAK', 'MUM_HI_SEAS', 'KCH_LAK', 'CHN_VIZ_PUD', 'MUM_WASIA']
     ships = ['EMPRESS', 'SKY'] 
     cabins = ['INTERIOR', 'SEA_VIEW', 'BALCONY', 'SUITE'] 
 
