@@ -56,7 +56,7 @@ try:
     
     # Flag 1 if the route goes to Lakshadweep (LAK) AND month is May, June, July, August, or September
     df['is_monsoon_disruption'] = df.apply(
-        lambda row: 1 if ("LAK" in str(row['route_code']) and row['sailing_month'] in) else 0, 
+        lambda row: 1 if ("LAK" in str(row['route_code']) and row['sailing_month'] in [5,6,7,8,9]) else 0, 
         axis=1
     )
 
