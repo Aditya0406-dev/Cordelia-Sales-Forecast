@@ -212,14 +212,14 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
     # --------------------------------------------------------------------------
     # PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW WITH COMPLIANT ROUTE KPI CARDS
     # --------------------------------------------------------------------------
-    elif page == "2. Route & Cabin Yield Matrix":
+        elif page == "2. Route & Cabin Yield Matrix":
         st.title("🧮 Route & Cabin Yield Matrix")
         st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
         
-        # Define Section 1.2 compliant arrays to loop over all 48 models
-        routes = ["MUM-GOA", "MUM-LAK", "MUM-HS", "KOCHI-LAK", "CHN-VIZ-PUD", "MUM-WA"]
+        # 1. FIXED STRINGS TO MATCH DATABASE SPECIFICATIONS (NO CRASH FILTER ALIGNMENT)
+        routes = ['MUM-GOA', 'MUM-LAK', 'MUM-HS, 'KCH-LAK', 'CHN-VIZ-PUD', 'MUM-WA']
         ships = ["EMPRESS", "SKY"]
-        cabins = ["BALCONY", "INTERIOR", "SEA_VIEW", "SUITE"]
+        cabins = ["INTERIOR", "SEA_VIEW", "BALCONY", "SUITE"]
 
         st.subheader("🔍 Select Target Model Filter Focus")
         selected_route = st.selectbox("Filter Display Segment by Route Code", ["ALL FLEET COMBINATIONS"] + routes)
@@ -261,60 +261,89 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 )
             
             # ==============================================================================
-            # RESTORED INTERACTIVE PREDICTIVE TIMELINE CHART (ITEM 13 & 14 FIXED)
+            # REAL 4x2 CABIN & SHIP MATRIX LAYOUT RECONSTRUCTION
             # ==============================================================================
             st.markdown("---")
-            st.subheader(f"📈 90-Day Predictive Voyage Timeline: {selected_route}")
+            st.subheader(f"📊 Cabin Yield Matrix Summary Grid ({selected_route})")
             
-            # Generate clean continuous 90-day time-series dates
-            timeline_dates = pd.date_range(start="2026-07-01", periods=90, freq="D")
+            matrix_rows = []
+            for cabin in cabins:
+                row_dict = {"Cabin Class": cabin.replace("_", " ")}
+                for ship in ships:
+                    # Isolate matching rows from master database matrix structure
+                    cell_match = filtered_df[
+                        (filtered_df["Cabin Class"].str.upper() == cabin) & 
+                        (filtered_df["Ship Name"].str.upper() == ship)
+                    ]
+                    if not cell_match.empty:
+                        bookings = int(cell_match["Simulated Booking"].sum())
+                        row_dict[ship] = f"{bookings:,} PAX"
+                    else:
+                        row_dict[ship] = "0 PAX"
+                matrix_rows.append(row_dict)
             
-            # Build clean trending arrays linked directly to your sidebar sliders
-            trend_base = np.linspace(route_sim_pax * 0.9, route_sim_pax * 1.1, 90)
-            noise = np.random.normal(0, route_sim_pax * 0.02, 90)
-            yhat_trend = np.clip(trend_base + noise, 0, None)
+            # Render the reconstructed structural grid onto screen frame
+            st.dataframe(pd.DataFrame(matrix_rows), use_container_width=True, hide_index=True)
+
+            # ==============================================================================
+            # REAL TIME-SERIES PIPELINE INTEGRATION (NO LINE SPACE OR SYNTHETIC NOISE)
+            # ==============================================================================
+            st.markdown("---")
+            st.subheader(f"📈 90-Day Predictive Voyage Timeline Detail")
             
-            # Calculate corporate confidence boundaries (Item 13 Compliance)
-            yhat_lower = yhat_trend * 0.88
-            yhat_upper = yhat_trend * 1.12
+            # Sub-filters to drill down to specific line charts cleanly without data clutter
+            col_s, col_c = st.columns(2)
+            with col_s:
+                active_ship = st.selectbox("Select Timeline Ship Context:", ships, key="matrix_ship_select")
+            with col_c:
+                active_cabin = st.selectbox("Select Timeline Cabin Context:", cabins, key="matrix_cabin_select")
             
-            df_chart = pd.DataFrame({
-                "Sailing Date": timeline_dates,
-                "Forecasted Bookings (PAX)": yhat_trend,
-                "Lower Bound": yhat_lower,
-                "Upper Bound": yhat_upper
-            })
-            
-            # Plot the series using official FinVector brand properties
-            fig = px.line(
-                df_chart, x="Sailing Date", y="Forecasted Bookings (PAX)",
-                title=f"Expected Booking Velocity Trends ({selected_route})",
-                color_discrete_sequence=[ACCENT_ORANGE]
-            )
-            
-            # Append shading properties to depict the confidence intervals perfectly
-            fig.add_scatter(
-                x=df_chart["Sailing Date"], y=df_chart["Upper Bound"], line=dict(width=0),
-                showlegend=False, name="Confidence High"
-            )
-            fig.add_scatter(
-                x=df_chart["Sailing Date"], y=df_chart["Lower Bound"], line=dict(width=0),
-                fill="tonexty", fillcolor="rgba(100, 24, 158, 0.15)",  # Translucent Purple Shade
-                showlegend=False, name="Confidence Low"
-            )
-            
-            fig.update_layout(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)")
-            
-            # MANDATORY STREAMLIT RENDER HOOK - Brings the graph back to your browser
-            st.plotly_chart(fig, use_container_width=True)
+            # Pull timeline data out of your actual pipeline results dataframe
+            if 'df_forecast' in locals():
+                target_key = f"{selected_route}_{active_ship}_{active_cabin}"
+                df_chart = df_forecast[df_forecast['model_key'] == target_key].sort_values('sailing_date')
+                
+                if not df_chart.empty:
+                    import plotly.graph_objects as go
+                    fig = go.Figure()
+                    
+                    # Upper confidence envelope tracker
+                    fig.add_trace(go.Scatter(
+                        x=df_chart['sailing_date'], y=df_chart['forecast_upper'],
+                        mode='lines', line=dict(width=0), showlegend=False
+                    ))
+                    # Lower confidence envelope tracker with translucent purple shading
+                    fig.add_trace(go.Scatter(
+                        x=df_chart['sailing_date'], y=df_chart['forecast_lower'],
+                        mode='lines', line=dict(width=0), fill='tonexty',
+                        fillcolor='rgba(100, 24, 158, 0.15)', name='95% Confidence Interval'
+                    ))
+                    # Expected point predictions linear tracker
+                    fig.add_trace(go.Scatter(
+                        x=df_chart['sailing_date'], y=df_chart['forecasted_bookings'],
+                        mode='lines', line=dict(color='#64189E', width=3), name='Forecasted Bookings'
+                    ))
+                    
+                    fig.update_layout(
+                        plot_bgcolor="white", paper_bgcolor="white", hovermode="x unified",
+                        margin=dict(l=20, r=20, t=20, b=20),
+                        legend=dict(orientation="h", y=1.1, x=1, xanchor="right")
+                    )
+                    fig.update_xaxes(showgrid=True, gridcolor='#E5E5E5')
+                    fig.update_yaxes(showgrid=True, gridcolor='#E5E5E5')
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.info(f"Awaiting timeline database tracking records for combo segment: {target_key}")
+            else:
+                st.warning("Master pipeline forecast results matrix file unavailable in application workspace memory stack.")
             
             st.markdown("---")
+            st.markdown("#### 📑 Granular Segment Ledger View")
             st.dataframe(filtered_df.drop(columns=["Raw Rate"]), use_container_width=True, hide_index=True)
         else:
             display_df["Highlight Status"] = "Global Fleet Context"
             st.markdown("#### 🌐 Complete 48-Model Enterprise Yield Ledger")
             st.dataframe(display_df.drop(columns=["Raw Rate"]), use_container_width=True, hide_index=True)
-
 
 # ==============================================================================
 # AUDIT-COMPLIANT WORKSPACES: (PAGES 3 & 4)
