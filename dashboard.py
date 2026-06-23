@@ -324,13 +324,14 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                     "MUM-WA": "MUM_WASIA"
                 }
                 
-                # Get the true backend key string from the map
-                backend_route = route_key_map.get(selected_route, selected_route)
                 
-                # Build target string filter using aligned keys (CLEAN UPPERCASE FOR BOTH VALUE STRINGS)
-                target_key = f"{backend_route}_{active_ship}_{active_cabin}".replace(" ", "_").strip().upper()
+                # ==============================================================================
+                # REPORT COMPLIANT TARGET KEY ROUTING 
+                # ==============================================================================
+                # Build target string filter using the clean, hyphenated data schema from the report
+                target_key = f"{selected_route}_{active_ship}_{active_cabin}".replace(" ", "_").strip().upper()
                 
-                # Standardize the CSV model_key column to upper case to bypass the 'Interior' vs 'INTERIOR' mismatch
+                # Standardize the CSV model_key column to upper case to bypass casing variations
                 df_chart = df_forecast[df_forecast['model_key'].astype(str).str.upper() == target_key].sort_values('sailing_date')
 
                 if not df_chart.empty:
@@ -346,7 +347,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                         showlegend=False
                     ))
                     
-                    # 2. Translucent branded shading using official FinVector Purple (#64189E) at 15% opacity
+                    # 2. Translucent branded shading using official FinVector Purple (#64189E) at 15% opacity (Item 14 Compliant)
                     fig.add_trace(go.Scatter(
                         x=df_chart['sailing_date'], 
                         y=df_chart['forecast_lower'],
@@ -377,10 +378,11 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                     fig.update_xaxes(showgrid=True, gridcolor='#E5E5E5')
                     fig.update_yaxes(showgrid=True, gridcolor='#E5E5E5')
                     
-                    # Renders the chart graphic to the frontend
+                    # Explicitly render the chart graphic to the frontend layout
                     st.plotly_chart(fig, use_container_width=True)
                 else:
                     st.info(f"Awaiting real Prophet timeline entries for model segment: {target_key}")
+
 
             st.markdown("---")
             st.markdown("#### 📑 Granular Segment Ledger View")
