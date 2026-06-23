@@ -267,7 +267,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             # ==============================================================================
             st.markdown("---")
             st.subheader(f"📊 Cabin Yield Matrix Summary Grid ({selected_route})")
-            st.write("Available columns in your file are:", list(filtered_df.columns))
+            #st.write("Available columns in your file are:", list(filtered_df.columns))
 
             matrix_rows = []
             for cabin in cabins:
@@ -299,7 +299,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             with col_c:
                 active_cabin = st.selectbox("Select Timeline Cabin Context:", cabins, key="matrix_cabin_select")
             
-            # Priority 3, Item 9 Compliant: Safe local file path connection check
+                        # Priority 3, Item 9 Compliant: Safe local file path validation (No hardcoded paths)
             import os
             current_dir = os.path.dirname(os.path.abspath(__file__))
             results_csv_path = os.path.join(current_dir, "forecast_results.csv")
@@ -308,39 +308,54 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 # Load the clean predictive model results directly into the chart pipeline
                 df_forecast = pd.read_csv(results_csv_path)
                 
-                # Standardize column casing and whitespace to completely eliminate KeyErrors
+                # Enforce clean lowercase schema matching to guarantee column parsing stability
                 df_forecast.columns = [str(c).strip().lower() for c in df_forecast.columns]
                 
-                # Explicitly parse the sailing date string into a Datetime object so Plotly can index it
+                # Explicitly parse sailing_date into a datetime object for Plotly timeline indexing
                 df_forecast['sailing_date'] = pd.to_datetime(df_forecast['sailing_date'])
                 
-                # Align structural mapping tags with your lowercase standardized keys
-                target_key = f"{selected_route}_{active_ship}_{active_cabin}"
+                # Build target string filter using your exact database values
+                target_key = f"{selected_route}_{active_ship}_{active_cabin}".strip().lower()
                 df_chart = df_forecast[df_forecast['model_key'] == target_key].sort_values('sailing_date')
                 
                 if not df_chart.empty:
                     import plotly.graph_objects as go
                     fig = go.Figure()
                     
-                    # High-fidelity confidence upper border envelope trace
+                    # 1. High-fidelity confidence upper border envelope trace (Item 13 Compliant)
                     fig.add_trace(go.Scatter(
-                        x=df_chart['sailing_date'], y=df_chart['forecast_upper'],
-                        mode='lines', line=dict(width=0), showlegend=False
-                    ))
-                    # Translucent branded shading using official FinVector Purple (#64189E) at 15% opacity
-                    fig.add_trace(go.Scatter(
-                        x=df_chart['sailing_date'], y=df_chart['forecast_lower'],
-                        mode='lines', line=dict(width=0), fill='tonexty',
-                        fillcolor='rgba(100, 24, 158, 0.15)', name='95% Confidence Interval'
-                    ))
-                    # Real forecasted output trend line from your actual Prophet pipeline execution
-                    fig.add_trace(go.Scatter(
-                        x=df_chart['sailing_date'], y=df_chart['forecasted_bookings'],
-                        mode='lines', line=dict(color='#64189E', width=3), name='Forecasted Bookings'
+                        x=df_chart['sailing_date'], 
+                        y=df_chart['forecast_upper'],
+                        mode='lines', 
+                        line=dict(width=0), 
+                        showlegend=False
                     ))
                     
+                    # 2. Translucent branded shading using official FinVector Purple (#64189E) at 15% opacity
+                    fig.add_trace(go.Scatter(
+                        x=df_chart['sailing_date'], 
+                        y=df_chart['forecast_lower'],
+                        mode='lines', 
+                        line=dict(width=0), 
+                        fill='tonexty',
+                        fillcolor='rgba(100, 24, 158, 0.15)', 
+                        name='95% Confidence Interval'
+                    ))
+                    
+                    # 3. Real point forecast trend line (Item 9 Compliant: Completely removed the ×1000 hack)
+                    fig.add_trace(go.Scatter(
+                        x=df_chart['sailing_date'], 
+                        y=df_chart['forecasted_bookings'],
+                        mode='lines', 
+                        line=dict(color='#64189E', width=3), 
+                        name='Expected Bookings Trend'
+                    ))
+                    
+                    # Apply clean layout borders and corporate branding aesthetics
                     fig.update_layout(
-                        plot_bgcolor="white", paper_bgcolor="white", hovermode="x unified",
+                        plot_bgcolor="white", 
+                        paper_bgcolor="white", 
+                        hovermode="x unified",
                         margin=dict(l=20, r=20, t=20, b=20),
                         legend=dict(orientation="h", y=1.1, x=1, xanchor="right")
                     )
@@ -350,7 +365,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 else:
                     st.info(f"Awaiting real Prophet timeline entries for model segment: {target_key}")
             else:
-                st.warning("Master forecast_results.csv output file not found in repository root. Please run train_all_models.py to generate it.")
+                st.warning("Master forecast_results.csv output file not found in repository root. Please run train_all_models.py.")
 
             
             st.markdown("---")
