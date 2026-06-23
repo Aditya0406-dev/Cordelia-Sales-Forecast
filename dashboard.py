@@ -275,8 +275,8 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
                 for ship in ships:
                     # Pure, explicit string names used here. No variables can leak or cause KeyErrors.
                     cell_match = filtered_df[
-                        (filtered_df["Cabin Category"].astype(str).str.upper().str.strip() == cabin) & 
-                        (filtered_df["Ship Name"].astype(str).str.upper().str.strip() == ship)
+                        (filtered_df["Cabin Tier"].astype(str).str.upper().str.strip() == cabin) & 
+                        (filtered_df["Vessel ID"].astype(str).str.upper().str.strip() == ship)
                     ]
                     if not cell_match.empty:
                         bookings = int(cell_match["Simulated Booking"].sum())
