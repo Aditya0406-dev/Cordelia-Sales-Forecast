@@ -5,6 +5,11 @@ import streamlit as st
 import plotly.graph_objects as go
 import sqlite3
 
+try:
+    with open("style.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+except Exception:
+    pass
 # ==============================================================================
 # AUDIT ITEM 12: RELIABLE LIVE MLOPS REGISTRY VALIDATION (NO FALSE FLAGS)
 # ==============================================================================
