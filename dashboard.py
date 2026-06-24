@@ -21,7 +21,8 @@ FORECAST_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
 # AUDIT ITEM 12: TRANSPARENT MLOPS SERVICE DETECTION LAYER (HONEST VERIFICATION)
 # ==============================================================================
 # Detect if the project context is running locally on your laptop workspace
-IS_LOCAL_DEV = os.path.exists(os.path.join(CURRENT_DIR, ".git"))
+IS_LOCAL_DEV = "localhost" in st.get_option("server.address") or "127.0.0.1" in st.get_option("server.address") if st.get_option("server.address") else True
+
 
 if IS_LOCAL_DEV:
     # On your laptop: Tick mark displays ONLY if your local mlflow.db is present and valid
