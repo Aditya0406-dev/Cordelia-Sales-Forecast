@@ -1,13 +1,30 @@
+/* 1. Hide default developer menu bars */
 header { visibility: hidden; }
-.stApp { background-color: #F9FAFB; }
+
+/* 2. Main application body background (Soft off-white canvas) */
+.stApp { 
+    background-color: #F9FAFB !important; 
+}
+
+/* 3. Deep Violet Sidebar Background Fix */
+section[data-testid="stSidebar"] {
+    background-color: #4C1D95 !important; /* Deep imperial violet */
+    border-right: 1px solid #4C1D95 !important;
+}
+
+/* 4. Fix sidebar text and labels to be highly visible white */
+section[data-testid="stSidebar"] .stMarkdown, 
+section[data-testid="stSidebar"] label, 
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span {
+    color: #FFFFFF !important;
+}
+
+/* 5. Format your homepage KPI metrics into modern white grid cards */
 div[data-testid="stMetricContainer"] {
     background-color: #FFFFFF !important;
     border: 1px solid #E5E7EB !important;
-    padding: 20px !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
-}
-section[data-testid="stSidebar"] {
-    background-color: #FFFFFF !important;
-    border-right: 1px solid #E5E7EB !important;
+    padding: 24px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
 }
