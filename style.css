@@ -1,14 +1,13 @@
-/* Clean Global Typography & Workspace Canvas */
-.stApp {
-    background-color: #FAFAFA !important;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+header { visibility: hidden; }
+.stApp { background-color: #F9FAFB; }
+div[data-testid="stMetricContainer"] {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E5E7EB !important;
+    padding: 20px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
 }
-
-/* Format form input text labels */
-label p {
-    font-size: 0.85rem !important;
-    color: #475569 !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.04em !important;
+section[data-testid="stSidebar"] {
+    background-color: #FFFFFF !important;
+    border-right: 1px solid #E5E7EB !important;
 }
