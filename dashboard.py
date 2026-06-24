@@ -210,9 +210,9 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
     # --------------------------------------------------------------------------
     # PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW WITH COMPLIANT ROUTE KPI CARDS
     # --------------------------------------------------------------------------
-       elif page == "2. Route & Cabin Yield Matrix":
-           st.title("🧮 Route & Cabin Yield Matrix")
-           st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
+    elif page == "2. Route & Cabin Yield Matrix":
+        st.title("🧮 Route & Cabin Yield Matrix")
+        st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
         
             # Aligned precisely with your database raw keys
             routes = ['MUM-GOA', 'MUM-LAK', 'MUM-HS', 'KCH-LAK', 'CHN-VIZ-PUD', 'MUM-WA']
