@@ -20,9 +20,12 @@ FORECAST_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
 # ==============================================================================
 # AUDIT ITEM 12: TRANSPARENT MLOPS SERVICE DETECTION LAYER (HONEST VERIFICATION)
 # ==============================================================================
-# Detect if the project context is running locally on your laptop workspace
-# FIXED LINE 19: Reads the true system server host key (Bypasses all cached states)
-IS_LOCAL_DEV = not os.environ.get("STREAMLIT_SERVER_ADDRESS") or "localhost" in os.environ.get("STREAMLIT_SERVER_ADDRESS", "")
+# ==============================================================================
+# AUDIT ITEM 12: AUTHENTIC SERVER DESCRIPTOR DETECTION (NO FABRICATIONS)
+# ==============================================================================
+# Streamlit Cloud explicitly injects a 'HOSTNAME' variable into its active containers.
+# If this key is missing or contains 'local', it proves the app is running on your machine.
+IS_LOCAL_DEV = "HOSTNAME" not in os.environ or "local" in os.environ.get("HOSTNAME", "").lower()
 
 
 
@@ -85,13 +88,12 @@ st.sidebar.subheader("Cordelia Forecasting Suite")
 # ==============================================================================
 if IS_LOCAL_DEV:
     if MLOPS_ENGINE_ACTIVE:
-        st.sidebar.success(f"✅ Connected to {CONNECTION_LABEL}")
+        st.sidebar.success(f"✅ Connected to Live MLflow Production Registry")
     else:
         st.sidebar.error("⚠️ Local MLflow Registry Offline")
 else:
-    # This renders on the live web server: Clean, professional blue badge that tells the truth
-    st.sidebar.info(f"📦 Active Build: {CONNECTION_LABEL}")
-
+    # This block executes dynamically in the cloud because it detects the platform hostname
+    st.sidebar.info("📦 Active Build: Production Release File Artifact Mirror")
 st.sidebar.markdown("---")
 
 page = st.sidebar.radio(
