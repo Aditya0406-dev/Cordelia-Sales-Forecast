@@ -250,7 +250,7 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
             
             st.markdown("---")
             st.subheader(f"📊 Cabin Yield Matrix Summary Grid ({selected_route})")
-            st.write("Available columns in your file are:", list(filtered_df.columns))
+            #st.write("Available columns in your file are:", list(filtered_df.columns))
             
             # Generate the 4x2 matrix summary matrix matching real total block aggregates
             matrix_rows = []
