@@ -214,177 +214,177 @@ if page in ["1. Fleet Executive Summary", "2. Route & Cabin Yield Matrix"]:
         st.title("🧮 Route & Cabin Yield Matrix")
         st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
         
-            # Aligned precisely with your database raw keys
-            routes = ['MUM-GOA', 'MUM-LAK', 'MUM-HS', 'KCH-LAK', 'CHN-VIZ-PUD', 'MUM-WA']
-            ships = ["EMPRESS", "SKY"]
-            cabins = ["INTERIOR", "SEA_VIEW", "BALCONY", "SUITE"]
+        # Aligned precisely with your database raw keys
+        routes = ['MUM-GOA', 'MUM-LAK', 'MUM-HS', 'KCH-LAK', 'CHN-VIZ-PUD', 'MUM-WA']
+        ships = ["EMPRESS", "SKY"]
+        cabins = ["INTERIOR", "SEA_VIEW", "BALCONY", "SUITE"]
     
-            st.subheader("🔍 Select Target Model Filter Focus")
-            selected_route = st.selectbox("Filter Display Segment by Route Code", ["ALL FLEET COMBINATIONS"] + routes)
+        st.subheader("🔍 Select Target Model Filter Focus")
+        selected_route = st.selectbox("Filter Display Segment by Route Code", ["ALL FLEET COMBINATIONS"] + routes)
     
-            # Build clean workspace data copies
-            display_df = df_base_fleet.copy()
+        # Build clean workspace data copies
+        display_df = df_base_fleet.copy()
             
-            # Explicitly strip column names to clear any accidental white spaces
-            display_df.columns = [str(c).strip() for c in display_df.columns]
+        # Explicitly strip column names to clear any accidental white spaces
+        display_df.columns = [str(c).strip() for c in display_df.columns]
     
-            # Apply global currency adjustments
-            display_df["Base Revenue"] = display_df["Base Revenue"] * rate_multiplier
-            display_df["Simulated Revenue"] = display_df["Simulated Revenue"] * rate_multiplier
-            display_df["Calculated RevPAX"] = display_df["Calculated RevPAX"] * rate_multiplier
-    
-            if selected_route != "ALL FLEET COMBINATIONS":
-                display_df["Highlight Status"] = np.where(display_df["Route Code"] == selected_route, "🎯 Focused Target", "Background Segment")
-                filtered_df = display_df[display_df["Route Code"] == selected_route].copy()
+    # Apply global currency adjustments
+        display_df["Base Revenue"] = display_df["Base Revenue"] * rate_multiplier
+        display_df["Simulated Revenue"] = display_df["Simulated Revenue"] * rate_multiplier
+        display_df["Calculated RevPAX"] = display_df["Calculated RevPAX"] * rate_multiplier
+
+        if selected_route != "ALL FLEET COMBINATIONS":
+            display_df["Highlight Status"] = np.where(display_df["Route Code"] == selected_route, "🎯 Focused Target", "Background Segment")
+            filtered_df = display_df[display_df["Route Code"] == selected_route].copy()
+            
+            st.markdown(f"#### 📊 Performance Summary Matrix for Route Segment: **{selected_route}**")
+            
+            # Read real values from database pipeline records directly
+            route_sim_pax = int(filtered_df["Simulated Booking"].sum())
+            route_sim_revenue = filtered_df["Simulated Revenue"].sum()
+            route_base_pax = filtered_df["Base Booking"].sum()
+            
+            route_pax_delta = route_sim_pax - route_base_pax
+            route_delta_str = f"{route_pax_delta:+,} seats shift" if route_pax_delta != 0 else "Baseline Stable"
+            
+            col_kpi1, col_kpi2 = st.columns(2)
+            with col_kpi1:
+                st.metric(
+                    label=f"{selected_route} BOOKING FORECAST (90 DAYS)", 
+                    value=f"{route_sim_pax:,} PAX", 
+                    delta=route_delta_str,
+                    delta_color="normal" if route_pax_delta >= 0 else "inverse"
+                )
+            with col_kpi2:
+                st.metric(
+                    label=f"{selected_route} PROJECTED GROSS TICKET YIELD", 
+                    value=f"{symbol}{route_sim_revenue:,.2f}",
+                    delta=f"Active Currency Mode: {currency}"
+                )
+            
+            # ==============================================================================
+            # REAL 4x2 MATRIX SUMMARY GRID - ENTIRELY DIRECT STRINGS TO FORCE-FIX KEYERROR
+            # ==============================================================================
+            st.markdown("---")
+            st.subheader(f"📊 Cabin Yield Matrix Summary Grid ({selected_route})")
+            st.write("Available columns in your file are:", list(filtered_df.columns))
+
+            matrix_rows = []
+            for cabin in cabins:
+                row_dict = {"Cabin Class": cabin.replace("_", " ")}
+                for ship in ships:
+                    cell_match = filtered_df[
+                        (filtered_df["Cabin Tier"].astype(str).str.upper().str.strip() == cabin) & 
+                        (filtered_df["Vessel ID"].astype(str).str.upper().str.strip() == ship)
+                    ]
+                    if not cell_match.empty:
+                        bookings = int(cell_match["Simulated Booking"].sum())
+                        row_dict[ship] = f"{bookings:,} PAX"
+                    else:
+                        row_dict[ship] = "0 PAX"
+                matrix_rows.append(row_dict)
+            
+            st.dataframe(pd.DataFrame(matrix_rows), use_container_width=True, hide_index=True)
+
+            # ==============================================================================
+            # REAL TIME-SERIES PIPELINE HOOKS
+            # ==============================================================================
+            st.markdown("---")
+            st.subheader(f"📈 90-Day Predictive Voyage Timeline Detail")
+            
+            col_s, col_c = st.columns(2)
+            with col_s:
+                active_ship = st.selectbox("Select Timeline Ship Context:", ships, key="matrix_ship_select")
+            with col_c:
+                active_cabin = st.selectbox("Select Timeline Cabin Context:", cabins, key="matrix_cabin_select")
+            
+            # Priority 3, Item 9 Compliant: Safe local file path validation
+            import os
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            results_csv_path = os.path.join(current_dir, "forecast_results.csv")
+
+            if os.path.exists(results_csv_path):
+                df_forecast = pd.read_csv(results_csv_path)
+                df_forecast.columns = [str(c).strip().lower() for c in df_forecast.columns]
+                df_forecast['sailing_date'] = pd.to_datetime(df_forecast['sailing_date'])
                 
-                st.markdown(f"#### 📊 Performance Summary Matrix for Route Segment: **{selected_route}**")
+                # EXPLICIT AUDIT MAP: Translates user selection strings to match backend database tracking tokens exactly
+                route_key_map = {
+                    "MUM-GOA": "MUM-GOA",
+                    "MUM-LAK": "MUM-LAK",
+                    "MUM-HS": "MUM-HS",
+                    "KCH-LAK": "KCH-LAK",
+                    "CHN-VIZ-PUD": "CHN-VIZ-PUD",
+                    "MUM-WA": "MUM-WA"
+                }
                 
-                # Read real values from database pipeline records directly
-                route_sim_pax = int(filtered_df["Simulated Booking"].sum())
-                route_sim_revenue = filtered_df["Simulated Revenue"].sum()
-                route_base_pax = filtered_df["Base Booking"].sum()
+                mapped_route = route_key_map.get(selected_route, selected_route)
+                target_key = f"{mapped_route}_{active_ship}_{active_cabin}".strip().upper()
                 
-                route_pax_delta = route_sim_pax - route_base_pax
-                route_delta_str = f"{route_pax_delta:+,} seats shift" if route_pax_delta != 0 else "Baseline Stable"
-                
-                col_kpi1, col_kpi2 = st.columns(2)
-                with col_kpi1:
-                    st.metric(
-                        label=f"{selected_route} BOOKING FORECAST (90 DAYS)", 
-                        value=f"{route_sim_pax:,} PAX", 
-                        delta=route_delta_str,
-                        delta_color="normal" if route_pax_delta >= 0 else "inverse"
-                    )
-                with col_kpi2:
-                    st.metric(
-                        label=f"{selected_route} PROJECTED GROSS TICKET YIELD", 
-                        value=f"{symbol}{route_sim_revenue:,.2f}",
-                        delta=f"Active Currency Mode: {currency}"
-                    )
-                
-                # ==============================================================================
-                # REAL 4x2 MATRIX SUMMARY GRID - ENTIRELY DIRECT STRINGS TO FORCE-FIX KEYERROR
-                # ==============================================================================
-                st.markdown("---")
-                st.subheader(f"📊 Cabin Yield Matrix Summary Grid ({selected_route})")
-                st.write("Available columns in your file are:", list(filtered_df.columns))
-    
-                matrix_rows = []
-                for cabin in cabins:
-                    row_dict = {"Cabin Class": cabin.replace("_", " ")}
-                    for ship in ships:
-                        cell_match = filtered_df[
-                            (filtered_df["Cabin Tier"].astype(str).str.upper().str.strip() == cabin) & 
-                            (filtered_df["Vessel ID"].astype(str).str.upper().str.strip() == ship)
-                        ]
-                        if not cell_match.empty:
-                            bookings = int(cell_match["Simulated Booking"].sum())
-                            row_dict[ship] = f"{bookings:,} PAX"
-                        else:
-                            row_dict[ship] = "0 PAX"
-                    matrix_rows.append(row_dict)
-                
-                st.dataframe(pd.DataFrame(matrix_rows), use_container_width=True, hide_index=True)
-    
-                # ==============================================================================
-                # REAL TIME-SERIES PIPELINE HOOKS
-                # ==============================================================================
-                st.markdown("---")
-                st.subheader(f"📈 90-Day Predictive Voyage Timeline Detail")
-                
-                col_s, col_c = st.columns(2)
-                with col_s:
-                    active_ship = st.selectbox("Select Timeline Ship Context:", ships, key="matrix_ship_select")
-                with col_c:
-                    active_cabin = st.selectbox("Select Timeline Cabin Context:", cabins, key="matrix_cabin_select")
-                
-                # Priority 3, Item 9 Compliant: Safe local file path validation
-                import os
-                current_dir = os.path.dirname(os.path.abspath(__file__))
-                results_csv_path = os.path.join(current_dir, "forecast_results.csv")
-    
-                if os.path.exists(results_csv_path):
-                    df_forecast = pd.read_csv(results_csv_path)
-                    df_forecast.columns = [str(c).strip().lower() for c in df_forecast.columns]
-                    df_forecast['sailing_date'] = pd.to_datetime(df_forecast['sailing_date'])
+                df_chart = df_forecast[df_forecast['model_key'].astype(str).str.upper() == target_key].sort_values('sailing_date')
+
+                if not df_chart.empty:
+                    cols = list(df_chart.columns)
                     
-                    # EXPLICIT AUDIT MAP: Translates user selection strings to match backend database tracking tokens exactly
-                    route_key_map = {
-                        "MUM-GOA": "MUM-GOA",
-                        "MUM-LAK": "MUM-LAK",
-                        "MUM-HS": "MUM-HS",
-                        "KCH-LAK": "KCH-LAK",
-                        "CHN-VIZ-PUD": "CHN-VIZ-PUD",
-                        "MUM-WA": "MUM-WA"
-                    }
+                    upper_col = 'forecast_upper' if 'forecast_upper' in cols else ('yhat_upper' if 'yhat_upper' in cols else None)
+                    lower_col = 'forecast_lower' if 'forecast_lower' in cols else ('yhat_lower' if 'yhat_lower' in cols else None)
+                    forecast_col = 'forecasted_bookings' if 'forecasted_bookings' in cols else ('yhat' if 'yhat' in cols else cols)
+
+                    import plotly.graph_objects as go
+                    fig = go.Figure()
                     
-                    mapped_route = route_key_map.get(selected_route, selected_route)
-                    target_key = f"{mapped_route}_{active_ship}_{active_cabin}".strip().upper()
-                    
-                    df_chart = df_forecast[df_forecast['model_key'].astype(str).str.upper() == target_key].sort_values('sailing_date')
-    
-                    if not df_chart.empty:
-                        cols = list(df_chart.columns)
-                        
-                        upper_col = 'forecast_upper' if 'forecast_upper' in cols else ('yhat_upper' if 'yhat_upper' in cols else None)
-                        lower_col = 'forecast_lower' if 'forecast_lower' in cols else ('yhat_lower' if 'yhat_lower' in cols else None)
-                        forecast_col = 'forecasted_bookings' if 'forecasted_bookings' in cols else ('yhat' if 'yhat' in cols else cols)
-    
-                        import plotly.graph_objects as go
-                        fig = go.Figure()
-                        
-                        # 1. High-fidelity confidence upper border envelope trace
-                        if upper_col:
-                            fig.add_trace(go.Scatter(
-                                x=df_chart['sailing_date'], 
-                                y=df_chart[upper_col],
-                                mode='lines',
-                                line=dict(width=0),
-                                showlegend=False,
-                                name='Upper Bound'
-                            ))
-                        
-                        # 2. Confidence interval shading fill area
-                        if lower_col:
-                            fig.add_trace(go.Scatter(
-                                x=df_chart['sailing_date'], 
-                                y=df_chart[lower_col],
-                                mode='lines',
-                                fill='tonexty',
-                                fillcolor='rgba(106, 90, 205, 0.15)',
-                                line=dict(width=0),
-                                showlegend=False,
-                                name='Lower Bound'
-                            ))
-    
-                        # 3. Main point forecast prediction timeline line
+                    # 1. High-fidelity confidence upper border envelope trace
+                    if upper_col:
                         fig.add_trace(go.Scatter(
                             x=df_chart['sailing_date'], 
-                            y=df_chart[forecast_col],
-                            mode='lines+markers',
-                            line=dict(color='indigo', width=3),
-                            marker=dict(size=4),
-                            name='Forecasted PAX Count'
+                            y=df_chart[upper_col],
+                            mode='lines',
+                            line=dict(width=0),
+                            showlegend=False,
+                            name='Upper Bound'
                         ))
-    
-                        # FIX: FORCE PLOTLY TO USE WHOLE INTEGERS AND REMOVE ALL DECIMALS FROM AXIS AND HOVER
-                        fig.update_layout(
-                            title=f"90-Day Expected Booking Velocity Timeline ({target_key})",
-                            xaxis_title="Sailing Operations Date",
-                            yaxis_title="Expected Passenger Volume (PAX)",
-                            hovermode="x unified",
-                            template="plotly_white",
-                            yaxis=dict(
-                                tickformat='d',      # Forces clean discrete integers on the Y-Axis ticks
-                                hoverformat='d'      # Forces clean integers inside the tooltip hover popups
-                            )
+                    
+                    # 2. Confidence interval shading fill area
+                    if lower_col:
+                        fig.add_trace(go.Scatter(
+                            x=df_chart['sailing_date'], 
+                            y=df_chart[lower_col],
+                            mode='lines',
+                            fill='tonexty',
+                            fillcolor='rgba(106, 90, 205, 0.15)',
+                            line=dict(width=0),
+                            showlegend=False,
+                            name='Lower Bound'
+                        ))
+
+                    # 3. Main point forecast prediction timeline line
+                    fig.add_trace(go.Scatter(
+                        x=df_chart['sailing_date'], 
+                        y=df_chart[forecast_col],
+                        mode='lines+markers',
+                        line=dict(color='indigo', width=3),
+                        marker=dict(size=4),
+                        name='Forecasted PAX Count'
+                    ))
+
+                    # FIX: FORCE PLOTLY TO USE WHOLE INTEGERS AND REMOVE ALL DECIMALS FROM AXIS AND HOVER
+                    fig.update_layout(
+                        title=f"90-Day Expected Booking Velocity Timeline ({target_key})",
+                        xaxis_title="Sailing Operations Date",
+                        yaxis_title="Expected Passenger Volume (PAX)",
+                        hovermode="x unified",
+                        template="plotly_white",
+                        yaxis=dict(
+                            tickformat='d',      # Forces clean discrete integers on the Y-Axis ticks
+                            hoverformat='d'      # Forces clean integers inside the tooltip hover popups
                         )
-                        
-                        st.plotly_chart(fig, use_container_width=True)
-                    else:
-                        st.warning(f"⚠️ Clean historical timeline results for key '{target_key}' are currently unpopulated in your forecast registry file.")
+                    )
+                    
+                    st.plotly_chart(fig, use_container_width=True)
                 else:
-                    st.error("❌ Critical execution halt: 'forecast_results.csv' registry output is missing from the workspace root.")
+                    st.warning(f"⚠️ Clean historical timeline results for key '{target_key}' are currently unpopulated in your forecast registry file.")
+            else:
+                st.error("❌ Critical execution halt: 'forecast_results.csv' registry output is missing from the workspace root.")
 
             st.markdown("---")
             st.markdown("#### 📑 Granular Segment Ledger View")
