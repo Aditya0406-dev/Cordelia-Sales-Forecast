@@ -21,7 +21,9 @@ FORECAST_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
 # AUDIT ITEM 12: TRANSPARENT MLOPS SERVICE DETECTION LAYER (HONEST VERIFICATION)
 # ==============================================================================
 # Detect if the project context is running locally on your laptop workspace
-IS_LOCAL_DEV = "localhost" in st.get_option("server.address") or "127.0.0.1" in st.get_option("server.address") if st.get_option("server.address") else True
+# FIXED LINE 19: Reads the true system server host key (Bypasses all cached states)
+IS_LOCAL_DEV = not os.environ.get("STREAMLIT_SERVER_ADDRESS") or "localhost" in os.environ.get("STREAMLIT_SERVER_ADDRESS", "")
+
 
 
 if IS_LOCAL_DEV:
