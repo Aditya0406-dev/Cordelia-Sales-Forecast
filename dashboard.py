@@ -277,7 +277,7 @@ elif page == "2. Route & Cabin Yield Matrix":
             name='Simulated Projections'
         ))
 
-        fig.update_layout(
+          fig.update_layout(
             title=f"90-Day Expected Booking Influx Velocity ({target_key})", 
             xaxis_title="Sailing Operations Date", 
             yaxis_title="Daily Operational Booking Count (PAX / Day)", 
@@ -289,9 +289,11 @@ elif page == "2. Route & Cabin Yield Matrix":
     else:
         st.warning(f"⚠️ Selected model combination tracking metrics are currently unpopulated.")
             
-        st.markdown("---")
-        st.markdown("#### 📑 Granular Segment Ledger View")
-        st.dataframe(route_data.drop(columns=["base_fare", "base_revenue"]), use_container_width=True, hide_index=True)
+    # --- FIXED: Shifted completely left to align outside the if/else chart check blocks ---
+    st.markdown("---")
+    st.markdown("#### 📑 Granular Segment Ledger View")
+    st.dataframe(route_data.drop(columns=["base_fare", "base_revenue"]), use_container_width=True, hide_index=True)
+
 
 # ==============================================================================
 # AUDIT-COMPLIANT WORKSPACES: (PAGES 3 & 4)
