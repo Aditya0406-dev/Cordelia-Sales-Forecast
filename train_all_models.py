@@ -8,14 +8,14 @@ from datetime import datetime
 
 # --- LOCAL FILE PATH CONFIGURATION ---
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-CSV_PATH = os.path.join(CURRENT_DIR, "features", "final_engineered_features.csv")
+CSV_PATH = os.path.join(CURRENT_DIR, "features", "processed_features.csv")
 OUTPUT_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
 MLFLOW_TRACKING_URI = "http://127.0.0.1:5001"
 
 def execute_pipeline():
     print(f"--> Loading Phase 2 Data from: {CSV_PATH}")
     if not os.path.exists(CSV_PATH):
-        print(f"[ERROR] Could not find 'final_engineered_features.csv'!")
+        print(f"[ERROR] Could not find 'processed_features.csv'!")
         return
         
     df = pd.read_csv(CSV_PATH)
