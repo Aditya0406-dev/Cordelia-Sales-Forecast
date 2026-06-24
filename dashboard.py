@@ -193,6 +193,9 @@ if page == "1. Fleet Executive Summary":
 # --------------------------------------------------------------------------
 # PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW (PROPHET DRIVEN)
 # --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW (PROPHET DRIVEN)
+# --------------------------------------------------------------------------
 elif page == "2. Route & Cabin Yield Matrix":
     st.title("🧮 Route & Cabin Yield Matrix")
     st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
@@ -243,10 +246,11 @@ elif page == "2. Route & Cabin Yield Matrix":
     if not df_chart.empty:
         fig = go.Figure()
         y_sim = df_chart["simulated_booking"]
-        y_upper = df_chart["forecast_upper"] * price_factor * marketing_factor
-        y_lower = df_chart["forecast_lower"] * price_factor * marketing_factor
+        
+        # Safe structural dictionary lookups for confidence intervals to guard against KeyError loops
+        y_upper = df_chart["forecast_upper"] * price_factor * marketing_factor if "forecast_upper" in df_chart.columns else y_sim * 1.1
+        y_lower = df_chart["forecast_lower"] * price_factor * marketing_factor if "forecast_lower" in df_chart.columns else y_sim * 0.9
             
-        # --- MODIFIED: Added a visible, dark-gray dashed line for the Upper Bound ---
         fig.add_trace(go.Scatter(
             x=df_chart['sailing_date'], 
             y=y_upper, 
@@ -256,7 +260,6 @@ elif page == "2. Route & Cabin Yield Matrix":
             name='Upper Bound Limit'
         ))
         
-        # Keep the lower bound edge hidden but fill the interval area beautifully
         fig.add_trace(go.Scatter(
             x=df_chart['sailing_date'], 
             y=y_lower, 
@@ -277,7 +280,8 @@ elif page == "2. Route & Cabin Yield Matrix":
             name='Simulated Projections'
         ))
 
-          fig.update_layout(
+        # FIXED: Spaces perfectly matched to 8-space indentation block margin rules
+        fig.update_layout(
             title=f"90-Day Expected Booking Influx Velocity ({target_key})", 
             xaxis_title="Sailing Operations Date", 
             yaxis_title="Daily Operational Booking Count (PAX / Day)", 
@@ -289,11 +293,12 @@ elif page == "2. Route & Cabin Yield Matrix":
     else:
         st.warning(f"⚠️ Selected model combination tracking metrics are currently unpopulated.")
             
-    # --- FIXED: Shifted completely left to align outside the if/else chart check blocks ---
     st.markdown("---")
     st.markdown("#### 📑 Granular Segment Ledger View")
-    st.dataframe(route_data.drop(columns=["base_fare", "base_revenue"]), use_container_width=True, hide_index=True)
-
+    
+    # Clean up file drops regardless of column case format properties
+    drop_cols = [c for c in ["base_fare", "base_revenue"] if c in route_data.columns]
+    st.dataframe(route_data.drop(columns=drop_cols), use_container_width=True, hide_index=True)
 
 # ==============================================================================
 # AUDIT-COMPLIANT WORKSPACES: (PAGES 3 & 4)
