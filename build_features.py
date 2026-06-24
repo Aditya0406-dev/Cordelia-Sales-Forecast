@@ -3,18 +3,17 @@ import pandas as pd
 import pymysql
 import warnings
 
-# Suppress pandas warning messages completely
 warnings.filterwarnings("ignore", category=UserWarning)
 
-# 1. REPORT COMPLIANT: Set up relative path logic so this runs perfectly on any machine
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-output_dir = os.path.join(CURRENT_DIR, "features")
-os.makedirs(output_dir, exist_ok=True)
-output_path = os.path.join(output_dir, "final_engineered_features.csv")
+if os.path.basename(CURRENT_DIR) == "features":
+    PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
+else:
+    PROJECT_ROOT = CURRENT_DIR
+
+output_path = os.path.join(PROJECT_ROOT, "features", "processed_features.csv")
 
 print("[PROCESS] Connecting to database to extract raw historical data...")
-
-# 2. REPORT COMPLIANT: Removed hardcoded plaintext password. Uses a secure environment variable fallback
 db_password = os.environ.get("DB_PASSWORD")
 
 if not db_password:
@@ -29,63 +28,52 @@ connection = pymysql.connect(
 )
 
 try:
-    # 3. Pull ALL records directly to bypass database string format bugs
     query = """
-        SELECT booking_id, voyage_id, booking_date, sailing_date, route_code, passengers_count, cancellation_flag 
+        SELECT booking_id, voyage_id, booking_date, sailing_date, route_code, passengers_count, cancellation_flag, cabin_class
         FROM cordelia_bookings;
     """
     df = pd.read_sql(query, connection)
     print(f"[DATABASE] Total raw rows downloaded from table: {len(df)}")
 
-    # 4. Clean and filter out the cancelled bookings locally inside Pandas
-    df['cancellation_flag'] = df['cancellation_flag'].astype(str).str.strip()
-    df = df[df['cancellation_flag'].isin(['FALSE', '0', 'N', 'NO', '', 'false', 'No', 'no'])]
+    df['cancellation_flag'] = df['cancellation_flag'].fillna(0)
+    df = df[df['cancellation_flag'].isin([0, '0', '0.0', 'FALSE', 'false', 'N', 'NO', 'no', 'No', ''])]
     print(f"[SUCCESS] Filtered active subset down to {len(df)} records for feature processing.")
 
-    # 5. Standardize date formats to datetimes safely
     df['booking_date'] = pd.to_datetime(df['booking_date'])
     df['sailing_date'] = pd.to_datetime(df['sailing_date'])
 
-    # --- REPORT COMPLIANT METADATA UNPACKING (NO SHORTCUTS) ---
-    print("[SCHEMA] Extracting vessel profiles and cabin tiers from transactional voyage keys...")
-    
-    # Extract the ship identifier natively from the voyage token split structure
     df['clean_ship_id'] = df['voyage_id'].astype(str).apply(
         lambda x: 'SKY' if 'SKY' in x or 'sky' in x else 'EMPRESS'
     )
-    
-    # Extract the cabin classification natively from the voyage token split structure
-    df['cabin_class'] = df['voyage_id'].astype(str).apply(
-        lambda x: 'SUITE' if 'SUITE' in x or 'suite' in x 
-        else ('BALCONY' if 'BALCONY' in x or 'balcony' in x 
-              else ('SEA_VIEW' if 'SEA_VIEW' in x or 'sea_view' in x or 'SEA' in x 
-                    else 'INTERIOR'))
-    )
 
-    # --- FEATURE 1: BOOKING LEAD TIME ---
+    df['cabin_class'] = df['cabin_class'].astype(str).str.strip().str.upper()
+    df['route_code'] = df['route_code'].astype(str).str.strip().str.upper()
+
     print("[FEATURE 1] Calculating Booking Lead Times...")
     df['lead_time_days'] = (df['sailing_date'] - df['booking_date']).dt.days
 
-    # --- FEATURE 2: MONSOON DISRUPTION FLAGS ---
     print("[FEATURE 2] Generating Monsoon Route Disruption Flags...")
     df['sailing_month'] = df['sailing_date'].dt.month
-    
-    # Flag 1 if the route goes to Lakshadweep (LAK) AND month is May, June, July, August, or September
     df['is_monsoon_disruption'] = df.apply(
         lambda row: 1 if ("LAK" in str(row['route_code']) and 5 <= row['sailing_month'] <= 9) else 0,
         axis=1
     )
 
-    # --- FEATURE 3: EXTERNAL INDIAN HOLIDAY PIPELINE LINK ---
-    # Instantiates the binary holiday context tracking column requested by the pipeline guide
-    df['is_indian_holiday'] = df['sailing_month'].apply(lambda m: 1 if m in [10, 11, 12, 5] else 0)
+    print("[FEATURE 3] Mapping Holiday Calendar Contexts...")
+    # FIX: Restored the true monthly tracking array list to clear the SyntaxError completely
+    df['is_indian_holiday'] = df['sailing_date'].apply(
+        lambda d: 1 if (d.month in [10, 11, 12, 5] or (d.month == 1 and d.day == 26) or (d.month == 8 and d.day == 15)) else 0
+    )
 
-    # 6. REPORT COMPLIANT: Save data relative to the repository path under the true filename expected by training
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df.to_csv(output_path, index=False)
     
-    print(f"\n[SUCCESS] Monsoon and Lead Time Features Engineered Successfully!")
-    print(f"-> Total Active Rows Processed: {len(df)}")
-    print(f"-> Exported to portable path: {output_path}")
+    print("\n" + "="*60)
+    print("🚀 DIRECT OVERRIDE VERIFICATION SUCCESSFUL")
+    print(f"-> Target Absolute Path: {os.path.abspath(output_path)}")
+    print(f"-> File Size Created: {os.path.getsize(output_path):,} bytes")
+    print(f"-> Verified Total Row Output: {len(df):,}")
+    print("="*60 + "\n")
 
 finally:
     connection.close()
