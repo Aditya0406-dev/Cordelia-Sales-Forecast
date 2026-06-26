@@ -5,11 +5,6 @@ import streamlit as st
 import plotly.graph_objects as go
 import sqlite3
 
-try:
-    with open("style.css") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-except Exception:
-    pass
 # ==============================================================================
 # AUDIT ITEM 12: RELIABLE LIVE MLOPS REGISTRY VALIDATION (NO FALSE FLAGS)
 # ==============================================================================
@@ -18,45 +13,29 @@ db_file_path = os.path.join(CURRENT_DIR, "mlflow.db")
 FORECAST_PATH = os.path.join(CURRENT_DIR, "forecast_results.csv")
 
 # ==============================================================================
-# AUDIT ITEM 12: TRANSPARENT MLOPS SERVICE DETECTION LAYER (HONEST VERIFICATION)
+# UPDATED MLOPS SERVICE DETECTION LAYER (DIRECT REGISTRY VALIDATION)
 # ==============================================================================
-# ==============================================================================
-# AUDIT ITEM 12: AUTHENTIC SERVER DESCRIPTOR DETECTION (NO FABRICATIONS)
-# ==============================================================================
-# Streamlit Cloud explicitly injects a 'HOSTNAME' variable into its active containers.
-# If this key is missing or contains 'local', it proves the app is running on your machine.
-IS_LOCAL_DEV = "HOSTNAME" not in os.environ or "local" in os.environ.get("HOSTNAME", "").lower()
-
-
-
-if IS_LOCAL_DEV:
-    # On your laptop: Tick mark displays ONLY if your local mlflow.db is present and valid
-    if os.path.exists(db_file_path):
-        try:
-            conn = sqlite3.connect(f"file:{db_file_path}?mode=ro", uri=True)
-            test_df = pd.read_sql_query("SELECT 1 FROM experiments LIMIT 1;", conn)
-            conn.close()
-            MLOPS_ENGINE_ACTIVE = True
-        except Exception:
-            MLOPS_ENGINE_ACTIVE = False
-    else:
+if os.path.exists(db_file_path):
+    try:
+        conn = sqlite3.connect(f"file:{db_file_path}?mode=ro", uri=True)
+        test_df = pd.read_sql_query("SELECT 1 FROM experiments LIMIT 1;", conn)
+        conn.close()
+        MLOPS_ENGINE_ACTIVE = True
+        CONNECTION_LABEL = "Live MLflow Production Registry"
+    except Exception:
         MLOPS_ENGINE_ACTIVE = False
-    CONNECTION_LABEL = "Live MLflow Production Registry"
+        CONNECTION_LABEL = "Local MLflow Registry Database Error"
 else:
-    # On the web server: Automatically flags False to stay 100% honest 
-    # This prevents false positives since the local mlflow.db server won't be running in the cloud
     MLOPS_ENGINE_ACTIVE = False
     CONNECTION_LABEL = "Production Release File Artifact Mirror"
-
-
 # ==============================================================================
-# AUDIT ITEM 14: FINVECTOR HIGH-CONTRAST BRAND COMPLIANCE STYLE SHEET
+# AUDIT ITEM 14: HIGH-CONTRAST BRAND COMPLIANCE STYLE SHEET
 # ==============================================================================
 PRIMARY_PURPLE = "#64189E"  
 ACCENT_ORANGE = "#F1723F"   
 
 st.set_page_config(
-    page_title="FinVector | Cordelia Forecasting Dashboard",
+    page_title="FinVector | Cruise Enterprise Sales Forecast Dashboard",
     page_icon="🚢",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -78,36 +57,20 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# AUDIT ITEM 15: GLOBAL MULTI-PAGE NAVIGATION GATEWAY
+# CLEANED SIDEBAR CONFIGURATION (UPDATED DISPLAY LOGIC)
 # ==============================================================================
 st.sidebar.title("🚢 FinVector Analytics")
-st.sidebar.subheader("Cordelia Forecasting Suite")
+st.sidebar.subheader("Cruise Enterprise Sales Forecast Suite")
 
-# ==============================================================================
-# DYNAMIC SIDEBAR BUILD INTEGRATION
-# ==============================================================================
-if IS_LOCAL_DEV:
-    if MLOPS_ENGINE_ACTIVE:
-        st.sidebar.success(f"✅ Connected to Live MLflow Production Registry")
-    else:
-        st.sidebar.error("⚠️ Local MLflow Registry Offline")
+if MLOPS_ENGINE_ACTIVE:
+    st.sidebar.success(f"✅ Connected to {CONNECTION_LABEL}")
 else:
-    # This block executes dynamically in the cloud because it detects the platform hostname
-    st.sidebar.info("📦 Active Build: Production Release File Artifact Mirror")
+    st.sidebar.error(f"⚠️ {CONNECTION_LABEL}")
+
 st.sidebar.markdown("---")
 
-page = st.sidebar.radio(
-    "Navigation Menu",
-    [
-        "1. Fleet Executive Summary", 
-        "2. Route & Cabin Yield Matrix", 
-        "3. Scenario Planning (Fleet Expansion)", 
-        "4. Model Performance & Validation"
-    ]
-)
-
 # ==============================================================================
-# DATA INGESTION ENGINE: READ GENUINE MODEL FORECASTS (NO FAKED DICTIONARIES)
+# DATA INGESTION ENGINE
 # ==============================================================================
 @st.cache_data
 def load_forecast_registry_file():
@@ -124,25 +87,36 @@ rate_map = {"BALCONY": 18500.00, "INTERIOR": 8400.00, "SEA_VIEW": 11200.00, "SUI
 route_key_map = {"MUM-GOA": "MUM-GOA", "MUM-LAK": "MUM-LAK", "MUM-HS": "MUM-HS", "KCH-LAK": "KCH-LAK", "CHN-VIZ-PUD": "CHN-VIZ-PUD", "MUM-WA": "MUM-WA"}
 
 # ==============================================================================
-# SHARED SIMULATION CONTROL BOARD (GLOBAL CONFIGURATION ACCESS)
+# BI-DIRECTIONAL SIDEBAR SIMULATION CONTROLS (CHANGE 2)
 # ==============================================================================
 st.sidebar.subheader("⚙️ Scenario Simulation Sliders")
-ticket_price_adj = st.sidebar.slider("Ticket Price Adjustment (%)", -50, 50, 0)
-marketing_spend = st.sidebar.slider("Marketing Spend Surge Flag", 0, 100, 20)
+
+# Bi-directional control 1: Ticket Price Adjustment
+ticket_price_num = st.sidebar.number_input("Ticket Price Adjustment (%)", min_value=-50, max_value=50, value=0)
+ticket_price_adj = st.sidebar.slider("Adjust Price Slider:", min_value=-50, max_value=50, value=ticket_price_num, label_visibility="collapsed")
+
+# Bi-directional control 2: Marketing Spend
+marketing_num = st.sidebar.number_input("Marketing Spend Surge Flag", min_value=0, max_value=100, value=20)
+marketing_spend = st.sidebar.slider("Adjust Marketing Slider:", min_value=0, max_value=100, value=marketing_num, label_visibility="collapsed")
 
 st.sidebar.text_input("Voyage Configuration Vault Name", value="Monsoon Discount Plan")
 if st.sidebar.button("Save Parameters to Vault"):
     st.sidebar.success("Parameters Cached into Vault Presets")
 
-st.sidebar.markdown("---")
-st.sidebar.subheader("💱 Global Investor View")
-currency = st.sidebar.radio("SELECT REPORTING CURRENCY", ["INR (₹)", "USD ($)", "EUR (€)"])
+# ==============================================================================
+#CURRENCY SELECTION IN SIDEBAR (WITHOUT TITLE)
+# ==============================================================================
+currency_mode = st.sidebar.radio("SELECT REPORTING CURRENCY", ["INR (₹)", "USD ($)", "EUR (€)"])
 
 fx_symbols = {"INR (₹)": "₹", "USD ($)": "$", "EUR (€)": "€"}
 fx_rates = {"INR (₹)": 1.0, "USD ($)": 0.012, "EUR (€)": 0.011}
 
-symbol = fx_symbols[currency]
-rate_multiplier = fx_rates[currency]
+symbol = fx_symbols[currency_mode]
+rate_multiplier = fx_rates[currency_mode]
+currency = currency_mode
+
+
+# Default Base Reporting Currency Assumptions (Clean Workspace Mapping)
 
 price_factor = 1.0 - (ticket_price_adj / 100.0)
 marketing_factor = 1.0 + (marketing_spend / 100.0)
@@ -153,11 +127,22 @@ fc_master["base_revenue"] = fc_master["forecasted_bookings"] * fc_master["base_f
 fc_master["simulated_booking"] = (fc_master["forecasted_bookings"] * price_factor * marketing_factor).astype(int)
 fc_master["simulated_revenue"] = fc_master["simulated_booking"] * fc_master["base_fare"]
 
+
+# ==============================================================================
+# GLOBAL MULTI-PAGE NAVIGATION GATEWAY (TOP TABS - CHANGE 1)
+# ==============================================================================
+tab1, tab2, tab3, tab4 = st.tabs([
+    "1. Fleet Executive Summary", 
+    "2. Route & Cabin Yield Matrix", 
+    "3. Scenario Planning (Fleet Expansion)", 
+    "4. Model Performance & Validation"
+])
+
 # --------------------------------------------------------------------------
 # PAGE 1: FLEET EXECUTIVE SUMMARY VIEW
 # --------------------------------------------------------------------------
-if page == "1. Fleet Executive Summary":
-    st.title("Cordelia Cruise Enterprise Sales Forecast")
+with tab1:
+    st.title("Cruise Enterprise Sales Forecast Dashboard")
     st.markdown("### 📊 Fleet-Wide Aggregated Performance View")
     
     total_pax = int(fc_master["simulated_booking"].sum())
@@ -201,12 +186,9 @@ if page == "1. Fleet Executive Summary":
     st.dataframe(df_ledger, use_container_width=True, hide_index=True)
 
 # --------------------------------------------------------------------------
-# PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW (PROPHET DRIVEN)
+# PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW
 # --------------------------------------------------------------------------
-# --------------------------------------------------------------------------
-# PAGE 2: ROUTE & CABIN YIELD MATRIX VIEW (PROPHET DRIVEN)
-# --------------------------------------------------------------------------
-elif page == "2. Route & Cabin Yield Matrix":
+with tab2:
     st.title("🧮 Route & Cabin Yield Matrix")
     st.markdown("### • Live Highlight & Segment Drill-Down Engine •")
     
@@ -256,10 +238,8 @@ elif page == "2. Route & Cabin Yield Matrix":
     if not df_chart.empty:
         fig = go.Figure()
         y_sim = df_chart["simulated_booking"]
-        
-        # Safe structural dictionary lookups for confidence intervals to guard against KeyError loops
-        y_upper = df_chart["forecast_upper"] * price_factor * marketing_factor if "forecast_upper" in df_chart.columns else y_sim * 1.1
-        y_lower = df_chart["forecast_lower"] * price_factor * marketing_factor if "forecast_lower" in df_chart.columns else y_sim * 0.9
+        y_upper = df_chart["forecast_upper"] * price_factor * marketing_factor
+        y_lower = df_chart["forecast_lower"] * price_factor * marketing_factor
             
         fig.add_trace(go.Scatter(
             x=df_chart['sailing_date'], 
@@ -290,7 +270,6 @@ elif page == "2. Route & Cabin Yield Matrix":
             name='Simulated Projections'
         ))
 
-        # FIXED: Spaces perfectly matched to 8-space indentation block margin rules
         fig.update_layout(
             title=f"90-Day Expected Booking Influx Velocity ({target_key})", 
             xaxis_title="Sailing Operations Date", 
@@ -303,19 +282,15 @@ elif page == "2. Route & Cabin Yield Matrix":
     else:
         st.warning(f"⚠️ Selected model combination tracking metrics are currently unpopulated.")
             
-    st.markdown("---")
-    st.markdown("#### 📑 Granular Segment Ledger View")
-    
-    # Clean up file drops regardless of column case format properties
-    drop_cols = [c for c in ["base_fare", "base_revenue"] if c in route_data.columns]
-    st.dataframe(route_data.drop(columns=drop_cols), use_container_width=True, hide_index=True)
+        st.markdown("---")
+        st.markdown("#### 📑 Granular Segment Ledger View")
+        st.dataframe(route_data.drop(columns=["base_fare", "base_revenue"]), use_container_width=True, hide_index=True)
 
-# ==============================================================================
-# AUDIT-COMPLIANT WORKSPACES: (PAGES 3 & 4)
-# ==============================================================================
-elif page == "3. Scenario Planning (Fleet Expansion)":
+# --------------------------------------------------------------------------
+# PAGE 3: SCENARIO PLANNING (FLEET EXPANSION) - CLEANED WORKSPACE
+# --------------------------------------------------------------------------
+with tab3:
     st.title("🔮 Scenario Planning & Fleet Expansion Workspace")
-    st.info("Item 15 Compliant: Algorithmic capacity simulator running directly on top of model dimensions.")
     
     currency_mode = st.radio("SELECT SIMULATION DISPLAY CURRENCY", ["INR (₹)", "USD ($)", "EUR (€)"], horizontal=True)
     fx_symbols = {"INR (₹)": "₹", "USD ($)": "$", "EUR (€)": "€"}
@@ -354,15 +329,30 @@ elif page == "3. Scenario Planning (Fleet Expansion)":
     with scol1: st.metric(label=f"Projected Incremental Capacity ({target_expansion_route})", value=f"{sim_pax_final:,} PAX", delta=f"{int(selected_factor*100)}% Baseline Load")
     with scol2: st.metric(label="Simulated Incremental Revenue Yield", value=f"{active_symbol}{sim_revenue * active_multiplier:,.2f}", delta=f"Avg Route Fare: {active_symbol}{selected_rate * active_multiplier:,.2f}")
 
-elif page == "4. Model Performance & Validation":
+# --------------------------------------------------------------------------
+# PAGE 4: MODEL PERFORMANCE & VALIDATION - OWNING THE PROJECT LAYOUT
+# --------------------------------------------------------------------------
+with tab4:
     st.title("📉 Model Performance & Validation Metrics")
-    st.info("Item 15 Compliant: Genuine evaluation matrix loaded natively from the model tracking registry.")
 
     perf_df = fc_master.groupby(["route_code", "ship_id", "cabin_class"])["evaluation_mape"].first().reset_index()
     perf_df = perf_df[perf_df["evaluation_mape"] > 0]
-    perf_df.columns = ["Route Code", "Vessel ID", "Cabin Tier", "Natively Evaluated Model MAPE (%)"]
     
+    global_mape = perf_df["evaluation_mape"].mean()
+    
+    mcol1, mcol2 = st.columns(2)
+    with mcol1:
+        st.metric(
+            label="Global Mean Absolute Percentage Error (MAPE)", 
+            value=f"{global_mape:.2f}%",
+            delta="Target Threshold < 10.0%"
+        )
+    with mcol2:
+        st.metric(label="Evaluated Operational Routes", value=f"{len(perf_df['route_code'].unique())} Active Segments")
+        
+    st.markdown("---")
     st.markdown("#### Authenticated Experiment Ledger Index")
-    st.write("Every record below represents an audit-verified ground-truth tracking metrics directly mapped to mlflow.db.")
+    
+    perf_df.columns = ["Route Code", "Vessel ID", "Cabin Tier", "Natively Evaluated Model MAPE (%)"]
     st.dataframe(perf_df, use_container_width=True, hide_index=True)
 
